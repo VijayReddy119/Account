@@ -1,0 +1,79 @@
+﻿<Page x:Class="AccountFinance.Trail_balance"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:AccountFinance"
+      mc:Ignorable="d" 
+      xmlns:sys="clr-namespace:System;assembly=mscorlib"
+      Title="Trail_balance" Background="#FFF15D5D">
+    <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="400"/>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="80"/>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" x:Name="trail_bal_txt" HorizontalAlignment="Center" Text="Trail Balance - 1" TextWrapping="Wrap"
+             VerticalAlignment="Top" Height="45" Width="242" Foreground="White"
+             FontSize="30" FontWeight="Bold"/>
+        <StackPanel Grid.Row="1" HorizontalAlignment="Right"  Width="251" VerticalAlignment="Center" Orientation="Horizontal">
+            <Button Click="create_acc_Click" Content="Create Account" x:Name="create_acc" Width="100" Height="40" Visibility="Hidden"/>
+            <DatePicker SelectedDateChanged="date_trail_SelectedDateChanged" x:Name="date_trail" Width="150" FontSize="22" SelectedDate="{x:Static sys:DateTime.Now}"/>
+        </StackPanel>
+        <DataGrid x:Name="Output" HorizontalAlignment="Center" Width="556" FontSize="18" FontWeight="DemiBold" AutoGenerateColumns="false" Grid.Row="2" HorizontalScrollBarVisibility="Disabled">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Reciept" Width="150" Binding="{Binding bal_pos}">
+                    <DataGridColumn.HeaderStyle>
+                        <Style TargetType="{x:Type DataGridColumnHeader}">
+                            <Setter Property="Control.HorizontalContentAlignment" Value="Center"/>
+                        </Style>
+                    </DataGridColumn.HeaderStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Name" Width="250" Binding="{Binding name}">
+                    <DataGridColumn.HeaderStyle>
+                        <Style TargetType="{x:Type DataGridColumnHeader}">
+                            <Setter Property="Control.HorizontalContentAlignment" Value="Center"/>
+                        </Style>
+                    </DataGridColumn.HeaderStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Payment" Width="150" Binding="{Binding bal_neg}">
+                    <DataGridColumn.HeaderStyle>
+                        <Style TargetType="{x:Type DataGridColumnHeader}">
+                            <Setter Property="Control.HorizontalContentAlignment" Value="Center"/>
+                        </Style>
+                    </DataGridColumn.HeaderStyle>
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Grid Row="3" HorizontalAlignment="Center" Width="500" Margin="0,11.6,21,0.4">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="100"/>
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="tot_reciept" Width="110" Height="50" Padding="10" Margin="-1,0,0,12"
+               HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" FontSize="16"
+               FontWeight="Bold" IsReadOnly="true"/>
+            <TextBlock Text="Cash In Hand" Grid.Column="2" Grid.Row="0" Margin="10.4,23,-22.6,29" Grid.RowSpan="2"
+                 FontSize="18" FontWeight="Bold" Foreground="White"/>
+            <TextBox x:Name="tot_payment" Width="110" Height="50" Padding="10" HorizontalAlignment="Right" Grid.Row="0"
+               Grid.Column="2" Margin="0,-1,-225.6,13" FontSize="16" FontWeight="Bold" IsReadOnly="true"/>
+            <TextBox x:Name="cash_in_hand" Width="110" Height="50" Padding="10" Grid.Row="1" Grid.Column="2"
+               Margin="10.4,2,-19.6,10" FontSize="16" FontWeight="Bold" IsReadOnly="true"/>
+        </Grid>
+        <StackPanel Grid.Row="4" HorizontalAlignment="Center" Orientation="Horizontal">
+            <Button Click="trail_bal_1_Click" x:Name="trail_bal_1" Content="Trail Bal 1" Width="100" Height="50"/>
+            <Button Click="trail_bal_2_Click" x:Name="trail_bal_2" Content="Trail Bal 2" Width="100" Height="50"/>
+            <Button Click="trail_bal_3_Click"  x:Name="trail_bal_3" Content="Trail Bal 3" Width="100" Height="50"/>
+            <Button Click="t1_report_btn_Click" x:Name="t1_report_btn" Content="Trail Bal 1 Report" Width="100" Height="50"/>
+            <Button Click="t2_report_btn_Click" x:Name="t2_report_btn" Content="Trail Bal 2 Report" Width="100" Height="50"/>
+            <Button Click="t3_report_btn_Click"  x:Name="t3_report_btn" Content="Trail Bal 3 Report" Width="100" Height="50"/>
+        </StackPanel>
+    </Grid>
+</Page>

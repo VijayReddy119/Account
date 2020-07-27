@@ -1,0 +1,32 @@
+﻿<Window x:Class="AccountFinance.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AccountFinance"
+        mc:Ignorable="d"
+        Title="MainWindow" 
+        WindowState="Maximized"
+        >
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="0" VerticalAlignment="Top">
+            <TextBlock HorizontalAlignment="Center" x:Name="Line_no" Text="x" TextWrapping="Wrap" TextAlignment="Center" Background="#FF1EA3DD" VerticalAlignment="Center" Height="50" MinWidth="50" Width="auto" FontSize="30" Foreground="Black" FontWeight="Bold" Margin="0 30 0 0"/>
+            <Button Click="newCustomers_Click" Name="newCustomers" Content="New Customers" Height="30" Margin="0 50 0 0"/>
+            <Button Click="Posting_Click" Name="posting" Content="Posting" Height="30" Margin="0 12 0 0"/>
+            <Button Click="totalCustomers_Click" Name="accounts_disp" Content="Accounts Display" Height="30" Margin="0 12 0 0"/>
+            <Button Click="Village_wise_list_Click" Name="capital_account_list" Content="Capital Accounts List" Height="30" Margin="0 12 0 0"/>
+            <Button Click="chits_list_Click" Name="chits_list" Content="Chits Accounts List" Height="30" Margin="0 12 0 0"/>
+            <Button Click="partys_list_Click" Name="partys_list" Content="Partys List" Height="30" Margin="0 12 0 0"/>
+            <Button Click="partys_closing_list_Click" Name="partys_closing_list" Content="Closing List" Height="30" Margin="0 12 0 0"/>
+            <Button Click="trail_bal_Click" Name="trail_bal" Content="Trail Balance" Height="30" Margin="0 12 0 0"/>
+            <Button Click="daily_posting_list_Click" Name="daily_posting_list" Content="Daily Posting" Height="30" Margin="0 12 0 0"/>
+            <Button Click="close_Click" Name="close" Content="Closing" Height="30" Margin="0 12 0 0"/>
+            <Image Height="256" Margin="0,20,8,0" Source="20541-NT0XXW.ico"/>
+        </StackPanel>
+        <Frame x:Name="frameMainContent" Grid.Column="1" NavigationUIVisibility="Hidden" Source="{Binding}"/>
+    </Grid>
+</Window>

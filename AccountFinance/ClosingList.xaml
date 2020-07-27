@@ -1,0 +1,49 @@
+﻿<Page x:Class="BHAGAVANDVSOFTWARE.ClosingList"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:BHAGAVANDVSOFTWARE"
+      mc:Ignorable="d" 
+      Title="ClosingList"
+      Background="#FF1EA3DD"
+      Loaded="Page_Loaded">
+    <Page.Resources>
+        <Style TargetType="{x:Type TextBox}">
+            <Setter Property="CharacterCasing" Value="Upper"/>
+        </Style>
+    </Page.Resources>
+    <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="500"/>
+            <RowDefinition Height="60"/>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" HorizontalAlignment="Center" Text="Closing List" TextWrapping="Wrap" VerticalAlignment="Top" Height="62" Width="200" Background="#FF1EA3DD" Foreground="White" FontSize="30" FontWeight="Bold"/>
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <ToggleButton Checked="date_change_btn_Checked" Unchecked="date_change_btn_Unchecked" HorizontalAlignment="Right" Width="40" Height="40" Content="*" FontWeight="Bold" x:Name="date_change_btn"/>
+            <DatePicker HorizontalAlignment="Right" Width="200" Padding="10" Height="50" FontSize="20" FontWeight="Bold" x:Name="todays_date" SelectedDateChanged="todays_date_SelectedDateChanged"/>
+            <TextBlock Text="Search" VerticalAlignment="Center" FontSize="18" FontWeight="Bold" Foreground="White"/>
+            <TextBox x:Name="schquery" Width="200" Height="50" FontSize="18" FontWeight="Bold" Margin="10,5,0,5" Padding="10" TextChanged="schquery_TextChanged"/>
+            <ComboBox x:Name="search_by_village" Height="50" FontSize="18" FontWeight="Bold" Text="Search by Village" Width="150" Margin="10 0 0 0" SelectionChanged="search_by_village_SelectionChanged"/>
+            <Button Click="print_btn_Click" x:Name="print_btn" Content="Print" Width="100" Height="50" Margin="10 0 0 0" FontSize="16" FontWeight="Bold"/>
+            <Button Click="Button_Click" Content="Village Wise List" Width="150" Height="50" Margin="0 0 0 0" FontSize="16" FontWeight="Bold"/>
+        </StackPanel>
+        <DataGrid Grid.Row="2" Width="1000" FontSize="16" FontWeight="Bold" x:Name="Output" AutoGenerateColumns="False" IsReadOnly="True" >
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Slno" Width="80" Binding="{Binding slno}"/>
+                <DataGridTextColumn Header="Name" Width="220" Binding="{Binding name}"/>
+                <DataGridTextColumn Header="Village" Width="200" Binding="{Binding village}"/>
+                <DataGridTextColumn Header="Total" Width="120" Binding="{Binding reciept}"/>
+                <DataGridTextColumn Header="Paid" Width="120" Binding="{Binding payment}"/>
+                <DataGridTextColumn Header="LastPosting" Width="120" Binding="{Binding last_posting_date}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Width="380">
+            <TextBlock Text="Total Amt:" TextWrapping="Wrap" Width="100" Height="50" x:Name="total_amt_sum" FontSize="18" FontWeight="Bold" Background="Wheat" Margin="0,5"/>
+            <TextBlock Text="Total Paid:" TextWrapping="Wrap" Width="100" Height="50" x:Name="total_paid_sum" FontSize="18" FontWeight="Bold" Background="Wheat" Margin="0,5"/>
+            <TextBlock Text="Total Balance:" TextWrapping="Wrap" Width="120" Height="50" x:Name="total_bal_sum" FontSize="18" FontWeight="Bold" Background="Wheat" Margin="0,5"/>
+        </StackPanel>
+    </Grid>
+</Page>

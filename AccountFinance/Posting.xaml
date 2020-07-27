@@ -1,0 +1,151 @@
+﻿<Page x:Class="AccountFinance.Posting"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:AccountFinance"
+      mc:Ignorable="d" 
+      Title="Posting" Background="#FF518584">
+    <Page.Resources>
+        <Style TargetType="{x:Type TextBox}">
+            <Setter Property="CharacterCasing" Value="Upper"/>
+        </Style>
+    </Page.Resources>
+    <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="850"/>
+            <ColumnDefinition Width="300"/>
+        </Grid.ColumnDefinitions>
+        <Grid Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="280"/>
+                <RowDefinition Height="170"/>
+                <RowDefinition Height="170"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid Row="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="70"/>
+                    <RowDefinition Height="70"/>
+                    <RowDefinition Height="70"/>
+                    <RowDefinition Height="70"/>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Orientation="Horizontal">
+                    <StackPanel Margin="10 0 0 0">
+                        <TextBlock Text="Date:" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <DatePicker KeyDown="Date_post_KeyDown" SelectedDateChanged="Date_post_SelectedDateChanged" x:Name="date_post"
+                        Margin="0,0,0,0.2" Width="150" FontSize="22"/>
+                    </StackPanel>
+                    <StackPanel Margin="20 0 0 0">
+                        <TextBlock Text="Slno:" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <ComboBox KeyDown="Slno_post_combo_KeyDown" SelectionChanged="Slno_post_combo_SelectionChanged"
+                      x:Name="slno_post_combo" Width="150" Height="50" IsEditable="true" Padding="10" FontSize="18"
+                      FontWeight="Bold"/>
+                        <CheckBox x:Name="slno_edit_check" Visibility="Hidden"/>
+                    </StackPanel>
+                    <StackPanel Margin="20 0 0 0">
+                        <TextBlock Text="Name:" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <ComboBox KeyDown="Name_post_combo_KeyDown" SelectionChanged="Name_post_combo_SelectionChanged"
+                      x:Name="name_post_combo" Width="484" Height="50" IsEditable="true" Padding="10" FontSize="18"
+                      FontWeight="Bold"/>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal">
+                    <StackPanel Margin="20 0 0 0">
+                        <TextBlock Text="Reciept:" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <TextBox KeyDown="Reciept_post_KeyDown" PreviewTextInput="Reciept_post_PreviewTextInput"
+                     x:Name="reciept_post" Width="150" Height="50" Padding="10" FontSize="18" FontWeight="Bold"/>
+                    </StackPanel>
+                    <StackPanel Margin="20 0 0 0">
+                        <TextBlock Text="Payment:" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <TextBox KeyDown="Payment_post_KeyDown" PreviewTextInput="Payment_post_PreviewTextInput"
+                     x:Name="payment_post" Width="150" Height="50" Padding="10" FontSize="18" FontWeight="Bold"/>
+                    </StackPanel>
+                    <StackPanel Margin="20 0 0 0">
+                        <TextBlock Text="Interest:" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <TextBox KeyDown="Interest_post_KeyDown" PreviewTextInput="Interest_post_PreviewTextInput"
+                     x:Name="interest_post" Width="150" Height="50" Padding="10" FontSize="18" FontWeight="Bold"/>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal">
+                    <StackPanel>
+                        <TextBlock Text="Description:" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <TextBox KeyDown="Description_post_KeyDown" x:Name="description_post" Width="450" Height="50" Padding="10"
+                     FontSize="18" FontWeight="Bold"/>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal">
+                    <TextBlock Text="Starting Balance:" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    <TextBox x:Name="start_bal_postpos" Width="150" Height="50" Margin="10 0 0 0" Padding="10" FontSize="18"
+                   FontWeight="Bold"/>
+                    <TextBox x:Name="start_bal_postneg" Width="150" Height="50" Padding="10" FontSize="18" FontWeight="Bold"/>
+                </StackPanel>
+            </Grid>
+            <StackPanel Grid.Row="1">
+                <DataGrid MouseDoubleClick="Output_MouseDoubleClick" x:Name="Output" HorizontalAlignment="Center" Width="829"
+                  Height="168" FontSize="16" FontWeight="Bold" AutoGenerateColumns="false" Margin="5,0,-2,0">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="p_id" Width="0" Binding="{Binding posting_id}"/>
+                        <DataGridTextColumn Header="Date" Width="100" Binding="{Binding date}"/>
+                        <DataGridTextColumn Header="Slno." Width="80" Binding="{Binding slno}"/>
+                        <DataGridTextColumn Header="Name" Width="170" Binding="{Binding name}"/>
+                        <DataGridTextColumn Header="Details" Width="170" Binding="{Binding details}"/>
+                        <DataGridTextColumn Header="Reciept" Width="100" Binding="{Binding reciept}"/>
+                        <DataGridTextColumn Header="Payment" Width="100" Binding="{Binding payment}"/>
+                        <DataGridTextColumn Header="Interest" Width="100" Binding="{Binding interest}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+            <Grid Row="2" Margin="0 0 0 0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 0 30 0">
+                    <TextBlock Text="Present Amount" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"
+                     VerticalAlignment="Center"/>
+                    <TextBox x:Name="present_bal_postpos" Width="150" Height="50" Margin="10 0 0 0" Padding="10" FontSize="18"
+                   FontWeight="Bold" IsReadOnly="true"/>
+                    <TextBox x:Name="present_bal_postneg" Width="150" Height="50" Padding="10" FontSize="18" FontWeight="Bold"
+                   IsReadOnly="true"/>
+                </StackPanel>
+                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 0 30 0">
+                    <StackPanel HorizontalAlignment="Left" Margin="0 0 150 0">
+                        <TextBlock x:Name="last_posting_date" Text="Last Posting Date:" Width="229" Height="30" VerticalAlignment="Center" FontSize="16" FontWeight="Bold" Background="Wheat"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <TextBlock Text="Total Amount" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox x:Name="total_postpos" Width="150" Height="50" Margin="10 0 0 0" Padding="10" FontSize="18" IsReadOnly="true" FontWeight="Bold"/>
+                        <TextBox x:Name="total_postneg" Width="150" Height="50" Padding="10" FontSize="18" IsReadOnly="true" FontWeight="Bold"/>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 0 30 0">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0 0 150 0">
+                        <TextBlock Text="Balance:" Width="70" Height="30" VerticalAlignment="Center" FontSize="16" FontWeight="Bold"/>
+                        <TextBox x:Name="balance_account" Width="150" Height="30" VerticalAlignment="Center" FontSize="16" FontWeight="Bold" IsReadOnly="True"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <TextBlock Text="Total Balance" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"
+                     VerticalAlignment="Center"/>
+                        <TextBox x:Name="total_bal_pos" Width="150" Height="50" Margin="10 0 0 0" Padding="10" FontSize="18"
+                   FontWeight="Bold" IsReadOnly="true"/>
+                        <TextBox x:Name="total_bal_neg" Width="150" Height="50" Padding="10" FontSize="18" FontWeight="Bold"
+                   IsReadOnly="true"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+            <Grid Row="3" Margin="0 0 0 20">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Click="send_btn_Click" x:Name="send_btn" Content="Send" Width="80" Height="50" BorderBrush="Black" FontSize="20" FontWeight="Bold" Margin="10 0 0 0"/>
+                    <Button Click="Edit_btn_Click" x:Name="edit_btn" Content="Edit" Width="80" Height="50" BorderBrush="Black" IsEnabled="False" FontSize="20" FontWeight="Bold" Margin="10 0 0 0"/>
+                    <Button Click="Del_btn_Click" x:Name="del_btn" Content="Delete" Width="80" Height="50" Background="Red" BorderBrush="Black" FontSize="20" FontWeight="Bold" Margin="10 0 0 0" IsEnabled="False"/>
+                    <Button Click="Reset_btn_Click" x:Name="reset_btn" Content="Reset" Width="80" Height="50" Background="#FFD3D2F4" BorderBrush="Black" FontSize="20" FontWeight="Bold" Margin="10 0 0 0"/>
+                    <Button Click="Clear_btn_Click" x:Name="Clear_btn" Content="Clear Posting" Width="138" Height="50" Background="Coral" BorderBrush="Black" FontSize="20" FontWeight="Bold" Margin="10 0 0 0"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+        <ListBox MouseDoubleClick="Listbox_name_MouseDoubleClick" x:Name="listbox_name" Height="669"
+             Width="300" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.ColumnSpan="2" Margin="846,5,4.4,0"/>
+    </Grid>
+</Page>
