@@ -57,7 +57,7 @@
                     <ComboBoxItem>Profit</ComboBoxItem>
                 </ComboBox>
             </StackPanel>
-            <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="0 0 0 15">
+            <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="0 0 0 15" Visibility="Collapsed">
                 <TextBlock Text="Village:" FontSize="18" Width="130" Foreground="White" Margin="0,0,0,-0.8"/>
                 <ComboBox KeyDown="Village_KeyDown" x:Name="village" FontSize="18" Width="120" Background="White"
                   Margin="0,0,0,-0.8"/>
@@ -65,13 +65,13 @@
                  Margin="0,0,0,-0.8"/>
                 <Button Click="Add_village_btn_Click" x:Name="add_village_btn" Content="Add Village" Width="100"/>
             </StackPanel>
-            <StackPanel Grid.Row="5" Orientation="Horizontal" Margin="0 0 0 15">
+            <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="0 0 0 15">
                 <TextBlock Text="Interest Rate:" FontSize="18" Width="130" Foreground="White" Margin="0,0,0,0.4"/>
                 <TextBox KeyDown="Interest_rate_KeyDown" PreviewTextInput="Interest_rate_PreviewTextInput"
                  x:Name="interest_rate" FontSize="18" Width="146" Background="White" Margin="0,0,0,0.4"
                  IsEnabled="false"/>
             </StackPanel>
-            <StackPanel Grid.Row="6" Orientation="Horizontal" Margin="0 0 0 5" HorizontalAlignment="Center">
+            <StackPanel Grid.Row="5" Orientation="Horizontal" Margin="0 0 0 5" HorizontalAlignment="Center">
                 <Button Click="Save_btn_Click" x:Name="save_btn" Content="Save" Width="80" Height="40"
                 Background="#FFD3D2F4" BorderBrush="Black" FontSize="20" FontWeight="Bold"/>
                 <Button Click="Reset_btn_Click" x:Name="reset_btn" Content="Reset" Width="80" Height="40"

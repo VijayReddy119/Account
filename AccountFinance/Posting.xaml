@@ -61,7 +61,7 @@
                         <TextBox KeyDown="Payment_post_KeyDown" PreviewTextInput="Payment_post_PreviewTextInput"
                      x:Name="payment_post" Width="150" Height="50" Padding="10" FontSize="18" FontWeight="Bold"/>
                     </StackPanel>
-                    <StackPanel Margin="20 0 0 0">
+                    <StackPanel Margin="20 0 0 0" Visibility="Collapsed">
                         <TextBlock Text="Interest:" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
                         <TextBox KeyDown="Interest_post_KeyDown" PreviewTextInput="Interest_post_PreviewTextInput"
                      x:Name="interest_post" Width="150" Height="50" Padding="10" FontSize="18" FontWeight="Bold"/>

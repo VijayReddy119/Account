@@ -172,10 +172,15 @@ namespace AccountFinance
             }
             else if (acc_type.Text == "Partys")
             {
-                village.IsEnabled = true;
+                /*village.IsEnabled = true;
                 add_village.IsEnabled = true;
                 add_village_btn.IsEnabled = true;
-                village.Focus();
+                village.Focus();*/
+                Save_Data();
+                interest_rate.IsEnabled = false;
+                village.IsEnabled = false;
+                add_village.IsEnabled = false;
+                add_village_btn.IsEnabled = false;
             }
             else
             {
@@ -202,7 +207,7 @@ namespace AccountFinance
 
         private void Save_Data()
         {
-            if (slno.Text == "" || name.Text == "" || (acc_type.Text == "Partys" && village.Text == "") || (acc_type.Text == "Capital" && interest_rate.Text == ""))
+            if (slno.Text == "" || name.Text == "" || (acc_type.Text == "Capital" && interest_rate.Text == ""))
             {
                 MessageBox.Show("Please Fill Required Details");
             }

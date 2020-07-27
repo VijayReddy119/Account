@@ -20,8 +20,8 @@
             <Button Click="totalCustomers_Click" Name="accounts_disp" Content="Accounts Display" Height="30" Margin="0 12 0 0"/>
             <Button Click="Village_wise_list_Click" Name="capital_account_list" Content="Capital Accounts List" Height="30" Margin="0 12 0 0"/>
             <Button Click="chits_list_Click" Name="chits_list" Content="Chits Accounts List" Height="30" Margin="0 12 0 0"/>
-            <Button Click="partys_list_Click" Name="partys_list" Content="Partys List" Height="30" Margin="0 12 0 0"/>
-            <Button Click="partys_closing_list_Click" Name="partys_closing_list" Content="Closing List" Height="30" Margin="0 12 0 0"/>
+            <Button Click="partys_list_Click" Name="partys_list" Content="Partys List" Height="30" Margin="0 12 0 0" Visibility="Collapsed"/>
+            <Button Click="partys_closing_list_Click" Name="partys_closing_list" Content="Closing List" Height="30" Margin="0 12 0 0" Visibility="Collapsed"/>
             <Button Click="trail_bal_Click" Name="trail_bal" Content="Trail Balance" Height="30" Margin="0 12 0 0"/>
             <Button Click="daily_posting_list_Click" Name="daily_posting_list" Content="Daily Posting" Height="30" Margin="0 12 0 0"/>
             <Button Click="close_Click" Name="close" Content="Closing" Height="30" Margin="0 12 0 0"/>

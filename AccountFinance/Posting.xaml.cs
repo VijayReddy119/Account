@@ -187,7 +187,7 @@ namespace AccountFinance
         {
             if (e.Key != Key.Return)
                 return;
-            interest_post.Focus();
+            description_post.Focus();
         }
 
         private void Interest_post_KeyDown(object sender, KeyEventArgs e)

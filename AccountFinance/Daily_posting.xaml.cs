@@ -92,7 +92,7 @@ namespace AccountFinance
         {
             if (e.Key != Key.Return)
                 return;
-            interest_post.Focus();
+            description_post.Focus();
         }
 
         private void Interest_post_KeyDown(object sender, KeyEventArgs e)
@@ -225,12 +225,12 @@ namespace AccountFinance
                         num2 = account.payment;
                     }
 
-                    Decimal reciept = !(reciept_post.Text == "") && !(reciept_post.Text == "0") && !(reciept_post.Text.Trim() != " ") ? Decimal.Parse(reciept_post.Text) : new Decimal();
-                    Decimal payment = !(payment_post.Text == "") && !(payment_post.Text == "0") && !(payment_post.Text.Trim() != " ") ? Decimal.Parse(payment_post.Text) : new Decimal();
-
+                    Decimal reciept = !(reciept_post.Text == "") && !(reciept_post.Text == "0") && !(reciept_post.Text.Trim() == " ") ? Decimal.Parse(reciept_post.Text) : new Decimal();
+                    Decimal payment = !(payment_post.Text == "") && !(payment_post.Text == "0") && !(payment_post.Text.Trim() == " ") ? Decimal.Parse(payment_post.Text) : new Decimal();
 
                     Decimal num5 = num1 - reciept_b + reciept;
                     Decimal num6 = num2 - payment_b + payment;
+
 
                     List<string> acc_update = new List<string>()
                     {
