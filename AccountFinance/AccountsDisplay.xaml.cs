@@ -57,7 +57,6 @@ namespace AccountFinance
             if (acc_id_name.ContainsKey(slno_inp))
             {
                 string date = date_acc.SelectedDate.Value.ToString("dd-MM-yyyy");
-                Decimal interest_rate = new Decimal();
                 
                 List<int> slno_info = dataAccess.Load_Partys();
                 

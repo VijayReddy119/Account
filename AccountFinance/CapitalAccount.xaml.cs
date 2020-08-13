@@ -140,11 +140,11 @@ namespace AccountFinance
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             slno_combo.SelectedIndex = 0;
-                name_combo.SelectedIndex = 0;
-                if(slno_combo.SelectedValue != null)
-                {
-                    Acc_Disp_Load(slno_combo.SelectedValue.ToString());
-                }
+            name_combo.SelectedIndex = 0;
+            if(slno_combo.SelectedValue != null)
+            {
+                Acc_Disp_Load(slno_combo.SelectedValue.ToString());
+            }
         }
 
         private void name_combo_SelectionChanged(object sender, SelectionChangedEventArgs e)

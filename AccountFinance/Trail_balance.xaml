@@ -67,13 +67,14 @@
             <TextBox x:Name="cash_in_hand" Width="110" Height="50" Padding="10" Grid.Row="1" Grid.Column="2"
                Margin="10.4,2,-19.6,10" FontSize="16" FontWeight="Bold" IsReadOnly="true"/>
         </Grid>
-        <StackPanel Grid.Row="4" HorizontalAlignment="Center" Orientation="Horizontal">
+        <StackPanel Grid.Row="4" HorizontalAlignment="Center" Orientation="Horizontal" Margin="0,0,-53,0" Width="753">
             <Button Click="trail_bal_1_Click" x:Name="trail_bal_1" Content="Trail Bal 1" Width="100" Height="50"/>
             <Button Click="trail_bal_2_Click" x:Name="trail_bal_2" Content="Trail Bal 2" Width="100" Height="50"/>
             <Button Click="trail_bal_3_Click"  x:Name="trail_bal_3" Content="Trail Bal 3" Width="100" Height="50"/>
             <Button Click="t1_report_btn_Click" x:Name="t1_report_btn" Content="Trail Bal 1 Report" Width="100" Height="50"/>
             <Button Click="t2_report_btn_Click" x:Name="t2_report_btn" Content="Trail Bal 2 Report" Width="100" Height="50"/>
             <Button Click="t3_report_btn_Click"  x:Name="t3_report_btn" Content="Trail Bal 3 Report" Width="100" Height="50"/>
+            <Button Click="Capital_acc_Final_Click"  x:Name="Capital_acc_Final" Content="Capital Accounts Report" Width="148" Height="50" Margin="0,15"/>
         </StackPanel>
     </Grid>
 </Page>

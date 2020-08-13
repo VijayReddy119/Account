@@ -11,24 +11,28 @@ namespace AccountFinance
     public partial class Trail_balance : Page
     {
         private DataAccess dataAccess = new DataAccess();
-        protected bool t_2 = false;
-        private List<AccountFinance.account> account = new List<AccountFinance.account>();
+        protected bool t_2 = false, t_3 = false;
+        private List<account> account_list = new List<account>();
         public Trail_balance()
         {
             InitializeComponent();
             Load_data(1);
         }
 
-        private void Load_data(int n = 1)
+        private void Load_data(int n = 1, bool compute = false)
         {
-            account = dataAccess.Load_acc_db("", "", n, date_trail.SelectedDate.Value.ToString("dd-MM-yyyy"), false);
-            Output.ItemsSource = account;
+            if (!compute)
+            {
+                account_list = dataAccess.Load_acc_db("", "", n, date_trail.SelectedDate.Value.ToString("dd-MM-yyyy"), false);
+                Output.ItemsSource = account_list;
+            }
+
             Decimal num1 = new Decimal();
             Decimal num2 = new Decimal();
-            foreach (AccountFinance.account account in account)
+            foreach (account account_list in account_list)
             {
-                num1 += account.bal_pos;
-                num2 += account.bal_neg;
+                num1 += account_list.bal_pos;
+                num2 += account_list.bal_neg;
             }
             Decimal num4 = num1 - num2;
             Decimal num5;
@@ -71,6 +75,7 @@ namespace AccountFinance
         {
             Load_data(1);
             t_2 = false;
+            t_3 = false;
             trail_bal_txt.Text = "Trail Balance - 1";
             create_acc.Visibility = Visibility.Hidden;
         }
@@ -79,23 +84,30 @@ namespace AccountFinance
         {
             Load_data(2);
             t_2 = true;
+            t_3 = false;
             trail_bal_txt.Text = "Trail Balance - 2";
             create_acc.Visibility = Visibility.Hidden;
         }
 
         private void date_trail_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (!t_2)
-                return;
-            Load_data(2);
+            if (t_2)
+                Load_data(2, false);
+            else if (t_3)
+            {
+                Load_data(2, false);
+                account_list = show_Final_Acc(false);
+                Load_data(0, true);
+                Output.ItemsSource = account_list;
+            }
         }
 
         private void t1_report_btn_Click(object sender, RoutedEventArgs e)
         {
-            account = dataAccess.Load_acc_db("", "", 1, date_trail.SelectedDate.Value.ToString("dd-MM-yyyy"), false);
-            if (account == null)
+            account_list = dataAccess.Load_acc_db("", "", 1, date_trail.SelectedDate.Value.ToString("dd-MM-yyyy"), false);
+            if (account_list == null)
                 return;
-            new Report_Window("trail_bal", account, (List<records>)null, "TrailBal.rdlc", new List<string>()
+            new Report_Window("trail_bal", account_list, (List<records>)null, "TrailBal.rdlc", new List<string>()
       {
         "Reciept",
         "Name",
@@ -105,10 +117,10 @@ namespace AccountFinance
 
         private void t2_report_btn_Click(object sender, RoutedEventArgs e)
         {
-            account = dataAccess.Load_acc_db("", "", 2, date_trail.SelectedDate.Value.ToString("dd-MM-yyyy"), false);
-            if (account == null)
+            account_list = dataAccess.Load_acc_db("", "", 2, date_trail.SelectedDate.Value.ToString("dd-MM-yyyy"), false);
+            if (account_list == null)
                 return;
-            new Report_Window("trail_bal", account, (List<records>)null, "TrailBal.rdlc", new List<string>()
+            new Report_Window("trail_bal", account_list, (List<records>)null, "TrailBal.rdlc", new List<string>()
       {
         "Reciept",
         "Name",
@@ -116,20 +128,88 @@ namespace AccountFinance
       }).Show();
         }
 
+        private List<account> show_Final_Acc(bool onlyCapital = false)
+        {
+            List<account> accountList = new List<account>();
+            int num1 = 0;
+            Dictionary<int, Dictionary<string, int>> dictionary1 = new Dictionary<int, Dictionary<string, int>>();
+            int num2 = 0;
+            for (int index = 0; index < account_list.Count; ++index)
+            {
+                if (account_list[index].slno == -5)
+                    num2 += (int)account_list[index].bal_pos;
+                if (account_list[index].share > 0)
+                {
+                    Dictionary<string, int> dictionary2 = new Dictionary<string, int>();
+                    dictionary2.Add(account_list[index].name, account_list[index].share);
+                    num1 += account_list[index].share;
+                    dictionary1.Add(account_list[index].slno, dictionary2);
+                }
+            }
+            int num3 = 0;
+            int num4 = 0;
+            for (int index = 0; index < account_list.Count - 1; ++index)
+            {
+                if (account_list[index].type == "Partys")
+                    num3 += (int)account_list[index].bal_neg;
+                else if (account_list[index].type == "Chits")
+                    num4 += (int)account_list[index].bal_neg;
+                else if (account_list[index].type == "Capital" && account_list[index].share >= 0)
+                {
+                    accountList.Add(new account(account_list[index].bal_pos, account_list[index].name, account_list[index].bal_neg, account_list[index].slno, account_list[index].share, account_list[index].type));
+                    if (account_list[index].slno == account_list[index + 1].slno)
+                    {
+                        int slno = account_list[index].slno;
+                        string name = account_list[index].name;
+                        int num5 = num2 * dictionary1[slno][name] / num1;
+                        accountList.Add(new account(account_list[index + 1].bal_pos, name + " -Interest", Decimal.Zero, slno, 0, "Interest"));
+                        accountList.Add(new account((Decimal)num5, name + " -Share (" + dictionary1[slno][name].ToString() + ")", Decimal.Zero, slno, 0, "SHARE"));
+                        ++index;
+                    }
+                    else if (account_list[index].share > 0 && account_list[index].slno != account_list[index + 1].slno)
+                    {
+                        int slno = account_list[index].slno;
+                        string name = account_list[index].name;
+                        int num5 = num2 * dictionary1[slno][name] / num1;
+                        accountList.Add(new account((Decimal)num5, name + " -Share", Decimal.Zero, slno, 0, "SHARE"));
+                    }
+                }
+            }
+            if (onlyCapital)
+                return accountList;
+            accountList.Add(new account(Decimal.Zero, "Partys", (Decimal)num3, -123, 0, "Partys"));
+            accountList.Add(new account(Decimal.Zero, "Chits", (Decimal)num4, -234, 0, "Chits"));
+            accountList.Add(new account(Decimal.Zero, "PROFIT", Decimal.Zero, -5, 0, "PROFIT"));
+            return accountList;
+        }
+
+        private void Load_Final()
+        {
+            Load_data(2, false);
+            account_list = show_Final_Acc(false);
+            Output.ItemsSource = null;
+            Output.ItemsSource = account_list;
+            Load_data(1, true);
+            t_2 = false;
+            t_3 = true;
+        }
+
         private void trail_bal_3_Click(object sender, RoutedEventArgs e)
         {
-            Load_data(3);
+            Load_Final();
             t_2 = false;
-            trail_bal_txt.Text = "FINAL ACCOUNT";
+            trail_bal_txt.Text = "FINAL account_list";
             create_acc.Visibility = Visibility.Visible;
         }
 
         private void t3_report_btn_Click(object sender, RoutedEventArgs e)
         {
-            account = dataAccess.Load_acc_db("", "", 3, date_trail.SelectedDate.Value.ToString("dd-MM-yyyy"), false);
-            if (account == null)
+            Load_data(2, false);
+            account_list = show_Final_Acc(false);
+
+            if (account_list == null)
                 return;
-            new Report_Window("trail_bal", account, (List<records>)null, "TrailBal.rdlc", new List<string>() { "Reciept", "Name", "Payment" }).Show();
+            new Report_Window("trail_bal", account_list, (List<records>)null, "TrailBal.rdlc", new List<string>() { "Reciept", "Name", "Payment" }).Show();
         }
 
         private void create_acc_Click(object sender, RoutedEventArgs e)
@@ -140,6 +220,15 @@ namespace AccountFinance
             t_2 = false;
             trail_bal_txt.Text = "Trail Balance - 1";
             create_acc.Visibility = Visibility.Hidden;
+        }
+
+        private void Capital_acc_Final_Click(object sender, RoutedEventArgs e)
+        {
+            Load_data(2, false);
+            if (account_list == null)
+                return;
+            new Report_Window("Capital_Acc_Final", show_Final_Acc(true), (List<records>)null, "Capital_acc_Final.rdlc", (List<string>)null).Show();
+            Load_Final();
         }
     }
 }

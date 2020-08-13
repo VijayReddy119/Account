@@ -35,6 +35,83 @@ namespace AccountFinance
             */
         }
 
+        public void ModifyTableData()
+        {
+            using (SQLiteConnection sqLiteConnection = new SQLiteConnection("Data Source=" + DataAccess.db_path))
+            {
+                sqLiteConnection.Open();
+                Dictionary<string, string> dictionary = new Dictionary<string, string>();
+                using (SQLiteCommand sqLiteCommand = new SQLiteCommand("Select acc_id, date from accounts", sqLiteConnection))
+                {
+                    using (SQLiteDataReader sqLiteDataReader = sqLiteCommand.ExecuteReader())
+                    {
+                        if (sqLiteDataReader.HasRows)
+                        {
+                            while (sqLiteDataReader.Read())
+                            {
+                                string str = (sqLiteDataReader.GetString(1));
+                                int num = 0;
+                                try
+                                {
+                                    num = int.Parse(sqLiteDataReader.GetString(1));
+                                }
+                                catch (Exception)
+                                {
+                                    continue;
+                                }
+                                string[] strArray = str.Split('-');
+                                DateTime dateTime = new DateTime(int.Parse(strArray[2]), int.Parse(strArray[1]), int.Parse(strArray[0]));
+                                dictionary.Add(sqLiteDataReader.GetString(0), dateTime.Ticks.ToString());
+                            }
+                        }
+                    }
+                }
+                using (SQLiteCommand sqLiteCommand = new SQLiteCommand("Update accounts set date=@Entry where acc_id=@Entry1", sqLiteConnection))
+                {
+                    foreach (string key in dictionary.Keys)
+                    {
+                        sqLiteCommand.Parameters.AddWithValue("@Entry", (object)dictionary[key]);
+                        sqLiteCommand.Parameters.AddWithValue("@Entry1", (object)key);
+                        try
+                        {
+                            sqLiteCommand.ExecuteNonQuery();
+                        }
+                        catch (Exception)
+                        {
+                            int num = (int)MessageBox.Show("Error");
+                            break;
+                        }
+                    }
+                }
+              sqLiteConnection.Close();
+            }
+        }
+
+        public static void CheckDB()
+        {
+            using (SQLiteConnection sqLiteConnection = new SQLiteConnection("Data Source=" + DataAccess.db_path))
+            {
+                (sqLiteConnection).Open();
+                bool flag = false;
+                using (SQLiteCommand sqLiteCommand = new SQLiteCommand("PRAGMA table_info(accounts)", sqLiteConnection))
+                {
+                    SQLiteDataReader sqLiteDataReader = sqLiteCommand.ExecuteReader();
+                    int ordinal = (sqLiteDataReader).GetOrdinal("Name");
+                    while ((sqLiteDataReader).Read())
+                    {
+                        if ((sqLiteDataReader).GetString(ordinal).Equals("share"))
+                            flag = true;
+                    }
+                }
+                if (!flag)
+                {
+                    using (SQLiteCommand sqLiteCommand = new SQLiteCommand("ALTER TABLE accounts ADD share INTEGER NOT NULL DEFAULT 0", sqLiteConnection))
+                        (sqLiteCommand).ExecuteNonQuery();
+                }
+              (sqLiteConnection).Close();
+            }
+        }
+
         public static void SetDb(string dbname)
         {
             db_path = path_ + "/Data/New_data/" + dbname + ".db";
@@ -62,7 +139,7 @@ namespace AccountFinance
             SQLiteConnection connection = new SQLiteConnection("Data source = " + old_dbpath + ";Version=3;");
             try
             {
-                string commandText1 = "CREATE TABLE IF NOT EXISTS accounts (acc_id NVARCHAR(2048) PRIMARY KEY NOT NULL ,date NVARCHAR(2048) NOT NULL,slno INTEGER NOT NULL UNIQUE,name varchar(255) NOT NULL,village NVARCHAR(2048),type NVARCHAR(2048) NOT NULL,interest_rate NUMERIC DEFAULT '0', reciept_amt NUMERIC DEFAULT 0, payment_amt NUMERIC DEFAULT 0)";
+                string commandText1 = "CREATE TABLE IF NOT EXISTS accounts (acc_id NVARCHAR(2048) PRIMARY KEY NOT NULL ,date NVARCHAR(2048) NOT NULL,slno INTEGER NOT NULL UNIQUE,name varchar(255) NOT NULL,village NVARCHAR(2048),type NVARCHAR(2048) NOT NULL,interest_rate NUMERIC DEFAULT '0', reciept_amt NUMERIC DEFAULT 0, payment_amt NUMERIC DEFAULT 0,  share INTEGER NOT NULL DEFAULT 0)";
                 string commandText2 = "CREATE TABLE IF NOT EXISTS records (posting_id NVARCHAR(2048) NOT NULL PRIMARY KEY, date NVARCHAR(2048) NOT NULL,slno INTEGER NOT NULL,name varchar(255) NOT NULL, details varchar(255) NOT NULL DEFAULT '',reciept NUMERIC DEFAULT 0,payment NUMERIC DEFAULT 0,interest NUMERIC DEFAULT 0, acc_id NVARCHAR(2048) NOT NULL, FOREIGN KEY (acc_id) REFERENCES balances(acc_id))";
                 string commandText3 = "CREATE TABLE IF NOT EXISTS village(village NVARCHAR(2048) NOT NULL UNIQUE)";
                 string commandText4 = "CREATE TABLE IF NOT EXISTS lineTable(line_total_reciept NUMERIC Default 0,line_total_payment NUMERIC Default 0)";
@@ -147,7 +224,7 @@ namespace AccountFinance
                                 acc_id.Add(x.GetString(0));
                                 if (x.GetString(5) != "Sadhar" && x.GetString(5) != "Profit")
                                 {
-                                    acc_list.Add(new account(x.GetString(0), x.GetString(1), x.GetInt32(2), x.GetString(3), x.GetString(4), x.GetString(5), x.GetDecimal(6), x.GetDecimal(7), x.GetDecimal(8)));
+                                    acc_list.Add(new account(x.GetString(0), x.GetString(1), x.GetInt32(2), x.GetString(3), x.GetString(4), x.GetString(5), x.GetDecimal(6), x.GetDecimal(7), x.GetDecimal(8), x.GetInt32(10)));
                                 }
                             }
                             SQLiteCommand lineCmd = new SQLiteCommand("Select * from lineTable", con);
@@ -277,7 +354,7 @@ namespace AccountFinance
             {
                 connection.Open();
                 
-                string commandText1 = "CREATE TABLE IF NOT EXISTS accounts (acc_id NVARCHAR(2048) PRIMARY KEY NOT NULL ,date NVARCHAR(2048) NOT NULL,slno INTEGER NOT NULL UNIQUE,name varchar(255) NOT NULL,village NVARCHAR(2048),type NVARCHAR(2048) NOT NULL,interest_rate NUMERIC DEFAULT '0', reciept_amt NUMERIC DEFAULT 0, payment_amt NUMERIC DEFAULT 0, last_posting_date VARCHAR(2048) NOT NULL DEFAULT '')";
+                string commandText1 = "CREATE TABLE IF NOT EXISTS accounts (acc_id NVARCHAR(2048) PRIMARY KEY NOT NULL ,date NVARCHAR(2048) NOT NULL,slno INTEGER NOT NULL UNIQUE,name varchar(255) NOT NULL,village NVARCHAR(2048),type NVARCHAR(2048) NOT NULL,interest_rate NUMERIC DEFAULT '0', reciept_amt NUMERIC DEFAULT 0, payment_amt NUMERIC DEFAULT 0, last_posting_date VARCHAR(2048) NOT NULL DEFAULT '', share INTEGER NOT NULL DEFAULT 0)";
                 string commandText2 = "CREATE TABLE IF NOT EXISTS records (posting_id NVARCHAR(2048) NOT NULL PRIMARY KEY, date NVARCHAR(2048) NOT NULL,slno INTEGER NOT NULL,name varchar(255) NOT NULL, details varchar(255) NOT NULL DEFAULT '',reciept NUMERIC DEFAULT 0,payment NUMERIC DEFAULT 0,interest NUMERIC DEFAULT 0, acc_id NVARCHAR(2048) NOT NULL, FOREIGN KEY (acc_id) REFERENCES accounts(acc_id))";
                 string commandText3 = "CREATE TABLE IF NOT EXISTS village(village NVARCHAR(2048) NOT NULL UNIQUE)";
                 string commandText4 = "CREATE TABLE IF NOT EXISTS lineTable(line_total_reciept NUMERIC Default 0,line_total_payment NUMERIC Default 0)";
@@ -307,7 +384,7 @@ namespace AccountFinance
             SQLiteConnection conn = new SQLiteConnection("Data source = " + old_dbpath + ";Version=3;");
             try
             {
-                string commandText1 = "CREATE TABLE IF NOT EXISTS accounts (acc_id NVARCHAR(2048) NOT NULL ,date NVARCHAR(2048) NOT NULL,slno INTEGER NOT NULL,name varchar(255) NOT NULL,village NVARCHAR(2048),type NVARCHAR(2048) NOT NULL,interest_rate NUMERIC DEFAULT '0', reciept_amt NUMERIC DEFAULT 0, payment_amt NUMERIC DEFAULT 0, last_posting_date NVARCHAR(2048) NOT NULL DEFAULT '', deleted_date NVARCHAR(2048) NOT NULL DEFAULT '')";
+                string commandText1 = "CREATE TABLE IF NOT EXISTS accounts (acc_id NVARCHAR(2048) NOT NULL ,date NVARCHAR(2048) NOT NULL,slno INTEGER NOT NULL,name varchar(255) NOT NULL,village NVARCHAR(2048),type NVARCHAR(2048) NOT NULL,interest_rate NUMERIC DEFAULT '0', reciept_amt NUMERIC DEFAULT 0, payment_amt NUMERIC DEFAULT 0, last_posting_date NVARCHAR(2048) NOT NULL DEFAULT '', deleted_date NVARCHAR(2048) NOT NULL DEFAULT '', share INTEGER NOT NULL DEFAULT 0)";
                 string commandText2 = "CREATE TABLE IF NOT EXISTS records (posting_id NVARCHAR(2048) NOT NULL, date NVARCHAR(2048) NOT NULL,slno INTEGER NOT NULL,name varchar(255) NOT NULL, details varchar(255) NOT NULL DEFAULT '',reciept NUMERIC DEFAULT 0,payment NUMERIC DEFAULT 0,interest NUMERIC DEFAULT 0, acc_id NVARCHAR(2048) NOT NULL, FOREIGN KEY (acc_id) REFERENCES accounts(acc_id))";
                 string commandText3 = "CREATE TABLE IF NOT EXISTS village(village NVARCHAR(2048) NOT NULL UNIQUE)";
                 string commandText4 = "CREATE TABLE IF NOT EXISTS lineTable(line_total_reciept NUMERIC Default 0,line_total_payment NUMERIC Default 0)";
@@ -495,8 +572,8 @@ namespace AccountFinance
             try
             {
                 connection.Open();
-                
-                SQLiteCommand sqLiteCommand = new SQLiteCommand("INSERT INTO accounts(acc_id,date,slno,name,village,type,interest_rate) VALUES(@Entry,@Entry1,@Entry2,@Entry3,@Entry4,@Entry5,@Entry6);", connection);
+
+                SQLiteCommand sqLiteCommand = new SQLiteCommand("INSERT INTO accounts(acc_id,date,slno,name,village,type,interest_rate, share) VALUES(@Entry,@Entry1,@Entry2,@Entry3,@Entry4,@Entry5,@Entry6,@Entry7);", connection);
                 sqLiteCommand.Parameters.AddWithValue("@Entry", (object)data[0]);
                 sqLiteCommand.Parameters.AddWithValue("@Entry1", (object)data[1]);
                 sqLiteCommand.Parameters.AddWithValue("@Entry2", (object)data[2]);
@@ -504,6 +581,7 @@ namespace AccountFinance
                 sqLiteCommand.Parameters.AddWithValue("@Entry4", (object)data[4]);
                 sqLiteCommand.Parameters.AddWithValue("@Entry5", (object)data[5]);
                 sqLiteCommand.Parameters.AddWithValue("@Entry6", (object)data[6]);
+                sqLiteCommand.Parameters.AddWithValue("@Entry7", (object)data[7]);
                 int num1 = sqLiteCommand.ExecuteNonQuery();
                 
                 connection.Close();
@@ -527,15 +605,23 @@ namespace AccountFinance
             {
                 return new Decimal[2] { 0, 0 };
             }
-            else
-            {
-                string[] strArray1 = date_t.Split('-');
-                DateTime dateTime1 = new DateTime(int.Parse(strArray1[2]), int.Parse(strArray1[1]), int.Parse(strArray1[0]));
-                string[] strArray2 = date.Split('-');
-                DateTime dateTime2 = new DateTime(int.Parse(strArray2[2]), int.Parse(strArray2[1]), int.Parse(strArray2[0]));
-                int num = (dateTime1 - dateTime2).Days + 1;
-                return new Decimal[2] { reciept * (Decimal)num * interest_rate / new Decimal(3000), payment * (Decimal)num * interest_rate / new Decimal(3000) };
-            }
+            
+            string[] strArray1 = date_t.Split('-');
+            string[] strArray2 = date.Split('-');
+
+            /*
+            DateTime dateTime1 = new DateTime(int.Parse(strArray1[2]), int.Parse(strArray1[1]), int.Parse(strArray1[0]));
+            DateTime dateTime2 = new DateTime(int.Parse(strArray2[2]), int.Parse(strArray2[1]), int.Parse(strArray2[0]));
+            int num = (dateTime1 - dateTime2).Days + 1;
+            */
+
+            int num = (int.Parse(strArray2[2]) - int.Parse(strArray1[2])) * 12 * 30 + (int.Parse(strArray2[1]) - int.Parse(strArray1[1])) * 30 + (int.Parse(strArray2[0]) - int.Parse(strArray1[0]));
+
+            return new Decimal[2]{
+                Math.Round(Math.Abs(reciept * (Decimal) num * interest_rate / new Decimal(3000))),
+                Math.Round(Math.Abs(payment * (Decimal) num * interest_rate / new Decimal(3000)))
+            };
+            
         }
 
         public List<account> Load_acc_db(string inp = "", string type = "", int trail_b = 0, string date_t = "", bool p = false, string village_sch = "", bool monthly_int = false, string month="")
@@ -549,16 +635,17 @@ namespace AccountFinance
                 switch (trail_b)
                 {
                     case 1:
-                        using (SQLiteDataReader sqLiteDataReader1 = new SQLiteCommand("Select reciept_amt,name,payment_amt from accounts order by type", connection).ExecuteReader())
+                        using (SQLiteDataReader sqLiteDataReader = new SQLiteCommand("Select reciept_amt, name, payment_amt, slno, share, type from accounts order by type", connection).ExecuteReader())
                         {
-                            if (sqLiteDataReader1.HasRows)
+                            if (sqLiteDataReader.HasRows)
                             {
-                                while (sqLiteDataReader1.Read())
-                                    accountList.Add(new account(sqLiteDataReader1.GetDecimal(0), sqLiteDataReader1.GetString(1), sqLiteDataReader1.GetDecimal(2)));
+                                while (sqLiteDataReader.Read())
+                                    accountList.Add(new account((sqLiteDataReader).GetDecimal(0), (sqLiteDataReader).GetString(1), (sqLiteDataReader).GetDecimal(2), (sqLiteDataReader).GetInt32(3), (sqLiteDataReader).GetInt32(4), (sqLiteDataReader).GetString(5)));
                             }
-                            sqLiteDataReader1.Close();
+                            sqLiteDataReader.Close();
                         }
                         break;
+                        /*
                     case 3:
                         using (SQLiteDataReader sqLiteDataReader = new SQLiteCommand("Select reciept_amt,name,payment_amt,type from accounts order by type", connection).ExecuteReader())
                         {
@@ -576,6 +663,7 @@ namespace AccountFinance
                             sqLiteDataReader.Close();
                         }
                         break;
+                        */
                     case 2:
                         Decimal num1 = new Decimal();
                         Decimal num2 = new Decimal();
@@ -585,7 +673,7 @@ namespace AccountFinance
                             if (sqLiteDataReader2.HasRows)
                             {
                                 while (sqLiteDataReader2.Read())
-                                    num1 += sqLiteDataReader2.GetDecimal(0) - sqLiteDataReader2.GetDecimal(1);
+                                    num1 += Math.Abs(sqLiteDataReader2.GetDecimal(0) - sqLiteDataReader2.GetDecimal(1));
                             }
                             sqLiteDataReader2.Close();
                         }
@@ -600,7 +688,7 @@ namespace AccountFinance
                             sqLiteDataReader3.Close();
                         }
 
-                        Decimal int_bal = Math.Round(num2 - Math.Abs(num1), 2);
+                        Decimal int_bal = Math.Round(num2 - num1, 2);
                         Decimal num3 = new Decimal();
                         Dictionary<string, Decimal> dictionary = new Dictionary<string, Decimal>();
 
@@ -623,6 +711,7 @@ namespace AccountFinance
                                         while (sqLiteDataReader5.Read())
                                         {
                                             Decimal[] numArray = Compute_int(sqLiteDataReader5.GetString(2), sqLiteDataReader5.GetDecimal(3), sqLiteDataReader5.GetDecimal(4), sqLiteDataReader5.GetDecimal(5), date_t, sqLiteDataReader5.GetString(6));
+                                            
                                             if (dictionary.ContainsKey(sqLiteDataReader5.GetInt32(0).ToString()))
                                                 dictionary[sqLiteDataReader5.GetInt32(0).ToString()] += numArray[0] - numArray[1];
                                         }
@@ -633,6 +722,7 @@ namespace AccountFinance
 
                                 foreach (KeyValuePair<string, Decimal> keyValuePair in dictionary)
                                     num3 += keyValuePair.Value;
+
                                 int_bal -= num3;
                                 int_bal = Math.Round(int_bal, 2);
 
@@ -640,19 +730,36 @@ namespace AccountFinance
                             sqLiteDataReader4.Close();
                         }
 
-                        using (SQLiteDataReader sqLiteDataReader6 = new SQLiteCommand("Select name, reciept_amt, payment_amt, interest_rate, type, slno from accounts where type IN ('Capital','Chits','Partys')", connection).ExecuteReader())
+                        using (SQLiteDataReader sqLiteDataReader = new SQLiteCommand("Select name, reciept_amt, payment_amt, interest_rate, type, slno, share from accounts where type IN ('Partys')", connection).ExecuteReader())
                         {
-                            if (sqLiteDataReader6.HasRows)
+                            if ((sqLiteDataReader).HasRows)
                             {
-                                while (sqLiteDataReader6.Read())
-                                {
-                                    accountList.Add(new account(sqLiteDataReader6.GetDecimal(1), sqLiteDataReader6.GetString(0), sqLiteDataReader6.GetDecimal(2)));
-                                    if (sqLiteDataReader6.GetDecimal(3) > Decimal.Zero && sqLiteDataReader6.GetString(4) == "Capital" && dictionary.ContainsKey(sqLiteDataReader6.GetInt32(5).ToString()))
-                                        accountList.Add(new account(sqLiteDataReader6.GetString(0) + "-Interest", Math.Round(dictionary[sqLiteDataReader6.GetInt32(5).ToString()], 2)));
-                                }
-                                accountList.Add(new account("PROFIT", int_bal));
+                                while ((sqLiteDataReader).Read())
+                                    accountList.Add(new account((sqLiteDataReader).GetDecimal(1), (sqLiteDataReader).GetString(0), (sqLiteDataReader).GetDecimal(2), (sqLiteDataReader).GetInt32(5), (sqLiteDataReader).GetInt32(6), (sqLiteDataReader).GetString(4)));
                             }
-                            sqLiteDataReader6.Close();
+                            (sqLiteDataReader).Close();
+                        }
+                        using (SQLiteDataReader sqLiteDataReader = new SQLiteCommand("Select name, reciept_amt, payment_amt, interest_rate, type, slno, share from accounts where type IN ('Capital','Chits')", connection).ExecuteReader())
+                        {
+                            if ((sqLiteDataReader).HasRows)
+                            {
+                                while ((sqLiteDataReader).Read())
+                                {
+                                    accountList.Add(new account((sqLiteDataReader).GetDecimal(1), (sqLiteDataReader).GetString(0), (sqLiteDataReader).GetDecimal(2), (sqLiteDataReader).GetInt32(5), (sqLiteDataReader).GetInt32(6), (sqLiteDataReader).GetString(4)));
+                                    if (sqLiteDataReader.GetDecimal(3) > Decimal.Zero && sqLiteDataReader.GetString(4) == "Capital")
+                                    {
+                                        if(dictionary.ContainsKey(sqLiteDataReader.GetInt32(5).ToString()))
+                                        {
+                                            string name = (sqLiteDataReader).GetString(0) + "-Interest";
+                                            string index = (sqLiteDataReader).GetInt32(5).ToString();
+                                            account account = new account(name, Math.Round(dictionary[index], 2), (sqLiteDataReader).GetInt32(5));
+                                            accountList.Add(account);
+                                        }
+                                    }
+                                }
+                                accountList.Add(new account("PROFIT", int_bal, -5));
+                                break;
+                            }
                         }
                         break;
 
@@ -718,11 +825,11 @@ namespace AccountFinance
 
                                         if (inter.ContainsKey(read_disp_schCmd.GetInt32(2)))
                                         {
-                                            accountList.Add(new account(read_disp_schCmd.GetString(1), read_disp_schCmd.GetInt32(2), read_disp_schCmd.GetString(3), read_disp_schCmd.GetString(4), read_disp_schCmd.GetDecimal(7), read_disp_schCmd.GetDecimal(8), bal_, inter[read_disp_schCmd.GetInt32(2)]));
+                                            accountList.Add(new account(read_disp_schCmd.GetString(1), read_disp_schCmd.GetInt32(2), read_disp_schCmd.GetString(3), read_disp_schCmd.GetString(4), read_disp_schCmd.GetDecimal(7), read_disp_schCmd.GetDecimal(8), bal_, inter[read_disp_schCmd.GetInt32(2)], read_disp_schCmd.GetInt32(10)));
                                         }
                                         else
                                         {
-                                            accountList.Add(new account(read_disp_schCmd.GetString(1), read_disp_schCmd.GetInt32(2), read_disp_schCmd.GetString(3), read_disp_schCmd.GetString(4), read_disp_schCmd.GetDecimal(7), read_disp_schCmd.GetDecimal(8), bal_, 0));
+                                            accountList.Add(new account(read_disp_schCmd.GetString(1), read_disp_schCmd.GetInt32(2), read_disp_schCmd.GetString(3), read_disp_schCmd.GetString(4), read_disp_schCmd.GetDecimal(7), read_disp_schCmd.GetDecimal(8), bal_, 0, read_disp_schCmd.GetInt32(10)));
                                         }
                                     }
                                 }
@@ -738,7 +845,7 @@ namespace AccountFinance
                                     if (sqLiteDataReader5.HasRows)
                                     {
                                         while (sqLiteDataReader5.Read())
-                                            accountList.Add(new account(sqLiteDataReader5.GetString(1), sqLiteDataReader5.GetInt32(2), sqLiteDataReader5.GetString(3), sqLiteDataReader5.GetString(4), sqLiteDataReader5.GetString(5), sqLiteDataReader5.GetDecimal(6), sqLiteDataReader5.GetDecimal(7), sqLiteDataReader5.GetDecimal(8)));
+                                            accountList.Add(new account(sqLiteDataReader5.GetString(1), sqLiteDataReader5.GetInt32(2), sqLiteDataReader5.GetString(3), sqLiteDataReader5.GetString(4), sqLiteDataReader5.GetString(5), sqLiteDataReader5.GetDecimal(6), sqLiteDataReader5.GetDecimal(7), sqLiteDataReader5.GetDecimal(8), sqLiteDataReader5.GetInt32(10)));
                                     }
 
                                     sqLiteDataReader5.Close();
@@ -753,7 +860,7 @@ namespace AccountFinance
                                     if (sqLiteDataReader5.HasRows)
                                     {
                                         while (sqLiteDataReader5.Read())
-                                            accountList.Add(new account(sqLiteDataReader5.GetString(0), sqLiteDataReader5.GetString(1), sqLiteDataReader5.GetInt32(2), sqLiteDataReader5.GetString(3), sqLiteDataReader5.GetString(4), sqLiteDataReader5.GetString(5), sqLiteDataReader5.GetDecimal(6), sqLiteDataReader5.GetDecimal(7), sqLiteDataReader5.GetDecimal(8)));
+                                            accountList.Add(new account(sqLiteDataReader5.GetString(0), sqLiteDataReader5.GetString(1), sqLiteDataReader5.GetInt32(2), sqLiteDataReader5.GetString(3), sqLiteDataReader5.GetString(4), sqLiteDataReader5.GetString(5), sqLiteDataReader5.GetDecimal(6), sqLiteDataReader5.GetDecimal(7), sqLiteDataReader5.GetDecimal(8), sqLiteDataReader5.GetInt32(10)));
                                     }
                                     sqLiteDataReader5.Close();
                                 }
@@ -777,12 +884,12 @@ namespace AccountFinance
                                     if (type == "Chits")
                                     {
                                         while (sqLiteDataReader7.Read())
-                                            accountList.Add(new account(sqLiteDataReader7.GetString(1), sqLiteDataReader7.GetInt32(2), sqLiteDataReader7.GetString(3), sqLiteDataReader7.GetDecimal(7), sqLiteDataReader7.GetDecimal(8)));
+                                            accountList.Add(new account(sqLiteDataReader7.GetString(1), sqLiteDataReader7.GetInt32(2), sqLiteDataReader7.GetString(3), sqLiteDataReader7.GetDecimal(7), sqLiteDataReader7.GetDecimal(8), sqLiteDataReader7.GetInt32(10)));
                                     }
                                     else
                                     {
                                         while (sqLiteDataReader7.Read())
-                                            accountList.Add(new account(sqLiteDataReader7.GetString(0), sqLiteDataReader7.GetString(1), sqLiteDataReader7.GetInt32(2), sqLiteDataReader7.GetString(3), sqLiteDataReader7.GetString(4), sqLiteDataReader7.GetString(5), sqLiteDataReader7.GetDecimal(6), sqLiteDataReader7.GetDecimal(7), sqLiteDataReader7.GetDecimal(8)));
+                                            accountList.Add(new account(sqLiteDataReader7.GetString(0), sqLiteDataReader7.GetString(1), sqLiteDataReader7.GetInt32(2), sqLiteDataReader7.GetString(3), sqLiteDataReader7.GetString(4), sqLiteDataReader7.GetString(5), sqLiteDataReader7.GetDecimal(6), sqLiteDataReader7.GetDecimal(7), sqLiteDataReader7.GetDecimal(8), sqLiteDataReader7.GetInt32(10)));
                                     }
                                 }
                                 else
@@ -817,7 +924,7 @@ namespace AccountFinance
                     connection2.Open();
                     while (sqLiteDataReader1.Read())
                     {
-                        SQLiteCommand sqLiteCommand = new SQLiteCommand("INSERT INTO accounts(acc_id,date,slno,name,village,type,interest_rate,reciept_amt, payment_amt,last_posting_date,deleted_date) VALUES(@Entry,@Entry1,@Entry2,@Entry3,@Entry4,@Entry5,@Entry6,@Entry7,@Entry8,@Entry9, @Entry10);", connection2);
+                        SQLiteCommand sqLiteCommand = new SQLiteCommand("INSERT INTO accounts(acc_id,date,slno,name,village,type,interest_rate,reciept_amt, payment_amt,last_posting_date,deleted_date, share) VALUES(@Entry,@Entry1,@Entry2,@Entry3,@Entry4,@Entry5,@Entry6,@Entry7,@Entry8,@Entry9, @Entry10, @Entry11);", connection2);
                         sqLiteCommand.Parameters.AddWithValue("@Entry", (object)sqLiteDataReader1.GetString(0));
                         sqLiteCommand.Parameters.AddWithValue("@Entry1", (object)sqLiteDataReader1.GetString(1));
                         sqLiteCommand.Parameters.AddWithValue("@Entry2", (object)sqLiteDataReader1.GetInt32(2));
@@ -829,6 +936,7 @@ namespace AccountFinance
                         sqLiteCommand.Parameters.AddWithValue("@Entry8", (object)sqLiteDataReader1.GetDecimal(8));
                         sqLiteCommand.Parameters.AddWithValue("@Entry9", (object)sqLiteDataReader1.GetString(9));
                         sqLiteCommand.Parameters.AddWithValue("@Entry10", DateTime.Now.ToString("dd-MM-yyyy"));
+                        sqLiteCommand.Parameters.AddWithValue("@Entry11", (object)sqLiteDataReader1.GetInt32(10));
 
                         lineReciept = sqLiteDataReader1.GetDecimal(7);
                         linePayment = sqLiteDataReader1.GetDecimal(8);
@@ -920,7 +1028,7 @@ namespace AccountFinance
         {
             SQLiteConnection connection = new SQLiteConnection("Data Source = " + db_path + ";Version=3;");
             connection.Open();
-            SQLiteCommand sqLiteCommand1 = new SQLiteCommand("Update accounts set date=@Entry, slno=@Entry1, name=@Entry2, village=@Entry3, type=@Entry4, interest_rate=@Entry5 where acc_id=@Entry6;", connection);
+            SQLiteCommand sqLiteCommand1 = new SQLiteCommand("Update accounts set date=@Entry, slno=@Entry1, name=@Entry2, village=@Entry3, type=@Entry4, interest_rate=@Entry5, share=@Entry7 where acc_id=@Entry6;", connection);
             sqLiteCommand1.Parameters.AddWithValue("@Entry", (object)inptxt[1]);
             sqLiteCommand1.Parameters.AddWithValue("@Entry1", (object)inptxt[2]);
             sqLiteCommand1.Parameters.AddWithValue("@Entry2", (object)inptxt[3]);
@@ -928,6 +1036,7 @@ namespace AccountFinance
             sqLiteCommand1.Parameters.AddWithValue("@Entry4", (object)inptxt[5]);
             sqLiteCommand1.Parameters.AddWithValue("@Entry5", (object)inptxt[6]);
             sqLiteCommand1.Parameters.AddWithValue("@Entry6", (object)inptxt[0]);
+            sqLiteCommand1.Parameters.AddWithValue("@Entry7", (object)inptxt[7]);
 
             int num1 = 0;
             try
@@ -1546,7 +1655,7 @@ namespace AccountFinance
                         {
                             while (read.Read())
                             {
-                                profitAcc = new account(read.GetString(0), read.GetString(1), read.GetInt32(2), read.GetString(3), read.GetString(4), read.GetString(5), read.GetDecimal(6), read.GetDecimal(7), read.GetDecimal(8));
+                                profitAcc = new account(read.GetString(0), read.GetString(1), read.GetInt32(2), read.GetString(3), read.GetString(4), read.GetString(5), read.GetDecimal(6), read.GetDecimal(7), read.GetDecimal(8), read.GetInt32(10));
                             }
 
                         }
@@ -1769,7 +1878,7 @@ namespace AccountFinance
                         {
                             if (closeList)
                             {
-                                ls.Add(new account(reader_.GetString(0), reader_.GetString(1), reader_.GetInt32(2), reader_.GetString(3), reader_.GetString(4), reader_.GetString(5), reader_.GetDecimal(6), reader_.GetDecimal(7), reader_.GetDecimal(8), reader_.GetString(9)));
+                                ls.Add(new account(reader_.GetString(0), reader_.GetString(1), reader_.GetInt32(2), reader_.GetString(3), reader_.GetString(4), reader_.GetString(5), reader_.GetDecimal(6), reader_.GetDecimal(7), reader_.GetDecimal(8), reader_.GetString(9), reader_.GetInt32(10)));
                             }
                         }
                     }

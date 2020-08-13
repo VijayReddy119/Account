@@ -73,6 +73,19 @@ namespace AccountFinance
                     dataSourceValue.Rows.Add(values);
                 }
             }
+            else if(file_name == "Capital_acc_Final.rdlc")
+            {
+                PropertyInfo[] properties = typeof(account).GetProperties(BindingFlags.Instance | BindingFlags.Public);
+                foreach (PropertyInfo propertyInfo in properties)
+                    dataSourceValue.Columns.Add(propertyInfo.Name);
+                foreach (account acc in acc_list)
+                {
+                    object[] objArray = new object[properties.Length];
+                    for (int index = 0; index < properties.Length; ++index)
+                        objArray[index] = properties[index].GetValue((object)acc, (object[])null);
+                    dataSourceValue.Rows.Add(objArray);
+                }
+            }
             else
             {
                 if (rec_list != null && acc_list == null)

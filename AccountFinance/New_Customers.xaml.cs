@@ -49,6 +49,8 @@ namespace AccountFinance
                 {
                     interest_rate.IsEnabled = true;
                     interest_rate.Text = accountList[0].interest.ToString();
+                    share.IsEnabled = true;
+                    share.Text = accountList[0].share.ToString();
                 }
                 if (accountList[0].type.ToString() == "Partys")
                 {
@@ -100,11 +102,6 @@ namespace AccountFinance
                     }
                 }
             }
-        }
-
-        private void name_GotFocus(object sender, RoutedEventArgs e)
-        {
-            
         }
 
         private void Slno_KeyDown(object sender, KeyEventArgs e)
@@ -167,8 +164,10 @@ namespace AccountFinance
             if (acc_type.Text == "Capital")
             {
                 interest_rate.IsEnabled = true;
-                interest_rate.Focus();
                 interest_rate.Text = "1.5";
+
+                share.IsEnabled = true;
+                share.Focus();
             }
             else if (acc_type.Text == "Partys")
             {
@@ -217,21 +216,25 @@ namespace AccountFinance
 
                 string upper = village.Text.ToUpper();
                 string str3 = interest_rate.Text;
+                string str4 = share.Text;
 
                 if (acc_type.Text == "Capital")
                 {
                     upper = "";
                     str3 = (interest_rate.Text != "") ? interest_rate.Text : "1.5";
+                    str4 = this.share.Text != "" ? this.share.Text : "0";
                 }
                 else if (acc_type.Text == "Partys")
                 {
                     upper = village.Text.ToUpper();
                     str3 = "";
+                    str4 = "0";
                 }
                 else
                 {
                     upper = "";
                     str3 = "";
+                    str4 = "0";
                 }
 
 
@@ -250,7 +253,8 @@ namespace AccountFinance
                     text2,
                     upper,
                     text3,
-                    str3
+                    str3,
+                    str4
                   }))
                     return;
                 MessageBox.Show("Data Added");
@@ -267,6 +271,7 @@ namespace AccountFinance
             slno.Text = "";
             name.Text = "";
             interest_rate.Text = "";
+            share.Text = "";
             acc_list = dataAccess.Load_acc_db("", "", 0, "", false);
             Output.ItemsSource = acc_list;
             edit_slno_check.IsChecked = new bool?(false);
@@ -401,11 +406,15 @@ namespace AccountFinance
             {
                 interest_rate.IsEnabled = true;
                 interest_rate.Text = text5;
+                share.IsEnabled = true;
+                share.Text = (this.Output.SelectedCells[9].Column.GetCellContent(selectedItem) as TextBlock).Text;
             }
             else
             {
                 interest_rate.IsEnabled = false;
                 interest_rate.Text = "0";
+                share.IsEnabled = false;
+                share.Text = "0";
             }
 
             slno_dg = slno.Text;
@@ -428,8 +437,12 @@ namespace AccountFinance
             string text3 = acc_type.Text;
             string str1 = date_new.SelectedDate.Value.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture);
             string str2 = interest_rate.Text;
+            string text4 = share.Text;
             if (str2 == "")
                 str2 = "0";
+            if (text4 == "")
+                text4 = "0";
+
             if (dataAccess.Update_db(new List<string>()
           {
             acc_id,
@@ -438,7 +451,8 @@ namespace AccountFinance
             text2,
             upper,
             text3,
-            str2
+            str2,
+            text4
           }))
             {
                 MessageBox.Show("Data Updated");
@@ -478,6 +492,18 @@ namespace AccountFinance
             e.Handled = !regex.IsMatch((sender as System.Windows.Controls.TextBox).Text.Insert((sender as System.Windows.Controls.TextBox).SelectionStart, e.Text));
         }
 
+        private void share_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("^[.][0-9]+$|^[0-9]*[.]{0,1}[0-9]*$");
+            e.Handled = !regex.IsMatch((sender as TextBox).Text.Insert((sender as TextBox).SelectionStart, e.Text));
+        }
+
+        private void share_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+                interest_rate.Focus();
+        }
+
         private void Print_btn_Click(object sender, RoutedEventArgs e)
         {
             List<string> col_name = new List<string>() { "Date", "Slno", "Name", "Village", "Type", "Interest", "Reciept", "Payment" };
@@ -496,6 +522,7 @@ namespace AccountFinance
                 {
                     interest_rate.IsEnabled = true;
                     interest_rate.Text = "1.5";
+                    share.IsEnabled = true;
 
                     village.Text = "";
                     village.IsEnabled = false;
@@ -506,6 +533,8 @@ namespace AccountFinance
                 {
                     interest_rate.Text = "";
                     interest_rate.IsEnabled = false;
+                    share.IsEnabled = false;
+
                     village.IsEnabled = true;
                     add_village.IsEnabled = true;
                     add_village_btn.IsEnabled = true;
@@ -515,6 +544,8 @@ namespace AccountFinance
                     interest_rate.Text = "";
                     village.Text = "";
                     interest_rate.IsEnabled = false;
+                    share.IsEnabled = false;
+
                     village.IsEnabled = false;
                     add_village.IsEnabled = false;
                     add_village_btn.IsEnabled = false;

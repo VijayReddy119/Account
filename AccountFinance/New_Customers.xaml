@@ -45,7 +45,7 @@
             </StackPanel>
             <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0 0 0 15">
                 <TextBlock Text="Name:" FontSize="18" Width="130" Foreground="White" Margin="0,0,0,-0.8"/>
-                <TextBox GotFocus="name_GotFocus" KeyDown="Name_KeyDown" x:Name="name" FontSize="18" Width="350" Background="White" Margin="0,0,0,-0.8"/>
+                <TextBox KeyDown="Name_KeyDown" x:Name="name" FontSize="18" Width="350" Background="White" Margin="0,0,0,-0.8"/>
             </StackPanel>
             <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0 0 0 15">
                 <TextBlock Text="Type:" FontSize="18" Width="130" Foreground="White" Margin="0,0,0,0.2"/>
@@ -56,6 +56,8 @@
                     <ComboBoxItem>Sadhar</ComboBoxItem>
                     <ComboBoxItem>Profit</ComboBoxItem>
                 </ComboBox>
+                <TextBlock Text="Share: " FontSize="18" Width="50" Foreground="White" Margin="10,0,0,0.2"/>
+                <TextBox x:Name="share" FontSize="18" Width="50" Background="White" Margin="10,0,0,-0.8" PreviewTextInput="share_PreviewTextInput" KeyDown="share_KeyDown"/>
             </StackPanel>
             <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="0 0 0 15" Visibility="Collapsed">
                 <TextBlock Text="Village:" FontSize="18" Width="130" Foreground="White" Margin="0,0,0,-0.8"/>
@@ -83,7 +85,7 @@
         </Grid>
         <Viewbox Grid.Row="2">
             <DataGrid MouseDoubleClick="Output_MouseDoubleClick" x:Name="Output" Margin="0,0,-0.4,10"
-                HorizontalAlignment="Center" Width="1013" FontSize="15" FontWeight="Bold" AutoGenerateColumns="false" IsReadOnly="true" Height="295" SelectionMode="Single">
+                HorizontalAlignment="Center" Width="1054" FontSize="15" FontWeight="Bold" AutoGenerateColumns="false" IsReadOnly="true" Height="295" SelectionMode="Single">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Date" Width="80" Binding="{Binding date}"/>
                     <DataGridTextColumn Header="Slno." Width="50" Binding="{Binding slno}"/>
@@ -94,6 +96,7 @@
                     <DataGridTextColumn Header="Reciept" Width="80" Binding="{Binding reciept}"/>
                     <DataGridTextColumn Header="Payment" Width="80" Binding="{Binding payment}"/>
                     <DataGridTextColumn Header="Balance" Width="80" Binding="{Binding balance}"/>
+                    <DataGridTextColumn Header="Share" Width="80" Binding="{Binding share}"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Viewbox>

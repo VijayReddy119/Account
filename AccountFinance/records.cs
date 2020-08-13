@@ -61,17 +61,19 @@ namespace AccountFinance
             this.reciept = Math.Round(reciept, 2);
             this.payment = Math.Round(payment, 2);
             string[] strArray1 = date.Split('-');
-            DateTime dateTime = new DateTime(int.Parse(strArray1[2]), int.Parse(strArray1[1]), int.Parse(strArray1[0]));
             string[] strArray2 = date_new_x.Split('-');
-            DateTime newdate = new DateTime(int.Parse(strArray2[2]), int.Parse(strArray2[1]), int.Parse(strArray2[0]));
 
             int year = Int32.Parse(strArray2[2]) - Int32.Parse(strArray1[2]);
             int month = Int32.Parse(strArray2[1]) - Int32.Parse(strArray1[1]);
             int days_compu = Int32.Parse(strArray2[0]) - Int32.Parse(strArray1[0]);
 
             this.days = (year * 12 * 30) + (month * 30) + (days_compu);
-
-            //this.days = (new DateTime(int.Parse(strArray2[2]), int.Parse(strArray2[1]), int.Parse(strArray2[0])) - dateTime).Days + 1;
+            
+            /*
+            DateTime dateTime = new DateTime(int.Parse(strArray1[2]), int.Parse(strArray1[1]), int.Parse(strArray1[0]));
+            DateTime newdate = new DateTime(int.Parse(strArray2[2]), int.Parse(strArray2[1]), int.Parse(strArray2[0]));
+            this.days = (new DateTime(int.Parse(strArray2[2]), int.Parse(strArray2[1]), int.Parse(strArray2[0])) - dateTime).Days + 1;
+            */
 
             this.reciept_int = Math.Round(reciept * (Decimal)this.days * interest_rate / new Decimal(3000), 2);
             this.payment_int = Math.Round(payment * (Decimal)this.days * interest_rate / new Decimal(3000), 2);
