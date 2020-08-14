@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Forms;
 
 namespace AccountFinance
 {
@@ -31,7 +32,7 @@ namespace AccountFinance
         public records(string posting_id, string date, int slno, string name, string details, Decimal reciept, Decimal payment, Decimal interest)
         {
             this.posting_id = posting_id;
-            this.date = date;
+            this.date = new DateTime(long.Parse(date)).ToString("dd-MM-yyyy");
             this.slno = slno;
             this.name = name;
             this.details = details;
@@ -42,7 +43,7 @@ namespace AccountFinance
         public records(string posting_id, string date, int slno, string name, string details, Decimal reciept, Decimal payment, Decimal interest, string acc_id)
         {
             this.posting_id = posting_id;
-            this.date = date;
+            this.date = new DateTime(long.Parse(date)).ToString("dd-MM-yyyy");
             this.slno = slno;
             this.name = name;
             this.details = details;
@@ -54,13 +55,14 @@ namespace AccountFinance
 
         public records(string date, int slno, string name, string details, Decimal reciept, Decimal payment, string date_new_x, Decimal interest_rate)
         {
-            this.date = date;
+            this.date = new DateTime(long.Parse(date)).ToString("dd-MM-yyyy");
             this.slno = slno;
             this.name = name;
             this.details = details;
             this.reciept = Math.Round(reciept, 2);
             this.payment = Math.Round(payment, 2);
-            string[] strArray1 = date.Split('-');
+
+            string[] strArray1 = this.date.Split('-');
             string[] strArray2 = date_new_x.Split('-');
 
             int year = Int32.Parse(strArray2[2]) - Int32.Parse(strArray1[2]);
@@ -81,7 +83,7 @@ namespace AccountFinance
 
         public records(string date, int slno, string name, string details, Decimal reciept, Decimal payment, Decimal interest_rate)
         {
-            this.date = date;
+            this.date = new DateTime(long.Parse(date)).ToString("dd-MM-yyyy");
             this.slno = slno;
             this.name = name;
             this.details = details;

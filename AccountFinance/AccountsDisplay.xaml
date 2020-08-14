@@ -19,6 +19,9 @@
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top">
             <Button Click="print_btn_Click" x:Name="print_btn" Content="Print" Width="100" Height="50"/>
             <DatePicker SelectedDateChanged="date_acc_SelectedDateChanged" x:Name="date_acc" Width="166" FontSize="22" Height="39"/>
+            <ComboBox x:Name="month_cal" Width="80" FontSize="16" FontWeight="Bold" Margin="10 0 0 0" IsEditable="True" />
+            <ComboBox x:Name="year_cal" Width="100" FontSize="16" FontWeight="Bold" Margin="10 0 0 0" IsEditable="True"/>
+            <Button x:Name="load_year_month" Width="100" Content="Load Data" Margin="10 0 0 0" />
         </StackPanel>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
             <StackPanel>
@@ -32,7 +35,7 @@
                   FontSize="18" FontWeight="Bold" IsEditable="true" Padding="10"/>
             </StackPanel>
         </StackPanel>
-        <DataGrid x:Name="Output_data" Grid.Row="3" HorizontalAlignment="Center" Width="880" FontSize="18" FontWeight="DemiBold" AutoGenerateColumns="false">
+        <DataGrid x:Name="Output_data" Grid.Row="3" Margin="0 10 0 0" HorizontalAlignment="Center" Width="880" FontSize="18" FontWeight="DemiBold" AutoGenerateColumns="false">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Date" Width="110" Binding="{Binding date}"/>
                 <DataGridTextColumn Header="Details" Width="170" Binding="{Binding details}"/>

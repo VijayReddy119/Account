@@ -44,13 +44,16 @@ namespace AccountFinance
 
         private void Load_Posting_data(string date_t, string slno = "", string name = "")
         {
+            string[] date_spl = date_t.Split('-');
+            date_t = new DateTime(Int32.Parse(date_spl[2]), Int32.Parse(date_spl[1]), Int32.Parse(date_spl[0])).Ticks.ToString();
+
             if (slno == "" && name == "")
-                rec_list = dataAccess.Load_record(date: date_t);
+                rec_list = dataAccess.Load_record(date: date_t, p: true);
             else if (slno != "" && name == "")
-                rec_list = dataAccess.Load_record(sl_inp: slno,date: date_t);
+                rec_list = dataAccess.Load_record(sl_inp: slno,date: date_t, p: true);
             else if (slno == "" && name != "")
-                rec_list = dataAccess.Load_record(date: date_t, name: name);
-            
+                rec_list = dataAccess.Load_record(date: date_t, name: name, p: true);
+
             Output.ItemsSource = rec_list;
             Decimal num1 = new Decimal();
             Decimal num2 = new Decimal();

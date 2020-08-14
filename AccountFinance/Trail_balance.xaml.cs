@@ -12,6 +12,7 @@ namespace AccountFinance
     {
         private DataAccess dataAccess = new DataAccess();
         protected bool t_2 = false, t_3 = false;
+        protected string t_ = "";
         private List<account> account_list = new List<account>();
         public Trail_balance()
         {
@@ -23,7 +24,7 @@ namespace AccountFinance
         {
             if (!compute)
             {
-                account_list = dataAccess.Load_acc_db("", "", n, date_trail.SelectedDate.Value.ToString("dd-MM-yyyy"), false);
+                account_list = dataAccess.Load_acc_db(trail_b: n, date_t: date_trail.SelectedDate.Value.ToString("dd-MM-yyyy"));
                 Output.ItemsSource = account_list;
             }
 
@@ -74,8 +75,7 @@ namespace AccountFinance
         private void trail_bal_1_Click(object sender, RoutedEventArgs e)
         {
             Load_data(1);
-            t_2 = false;
-            t_3 = false;
+            t_ = "1";
             trail_bal_txt.Text = "Trail Balance - 1";
             create_acc.Visibility = Visibility.Hidden;
         }
@@ -83,23 +83,24 @@ namespace AccountFinance
         private void trail_bal_2_Click(object sender, RoutedEventArgs e)
         {
             Load_data(2);
-            t_2 = true;
-            t_3 = false;
+            t_ = "2";
             trail_bal_txt.Text = "Trail Balance - 2";
             create_acc.Visibility = Visibility.Hidden;
         }
 
         private void date_trail_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (t_2)
+            if (t_ == "2")
                 Load_data(2, false);
-            else if (t_3)
+            else if (t_ == "3")
             {
                 Load_data(2, false);
                 account_list = show_Final_Acc(false);
                 Load_data(0, true);
                 Output.ItemsSource = account_list;
             }
+            else if (t_ == "1")
+                Load_data();
         }
 
         private void t1_report_btn_Click(object sender, RoutedEventArgs e)
@@ -190,14 +191,13 @@ namespace AccountFinance
             Output.ItemsSource = null;
             Output.ItemsSource = account_list;
             Load_data(1, true);
-            t_2 = false;
-            t_3 = true;
+            t_ = "3";
         }
 
         private void trail_bal_3_Click(object sender, RoutedEventArgs e)
         {
             Load_Final();
-            t_2 = false;
+            t_ = "3";
             trail_bal_txt.Text = "FINAL account_list";
             create_acc.Visibility = Visibility.Visible;
         }
@@ -217,7 +217,7 @@ namespace AccountFinance
             dataAccess.CreateAcc();
 
             Load_data(1);
-            t_2 = false;
+            t_ = "1";
             trail_bal_txt.Text = "Trail Balance - 1";
             create_acc.Visibility = Visibility.Hidden;
         }

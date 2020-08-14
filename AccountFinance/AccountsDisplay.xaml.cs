@@ -24,7 +24,6 @@ namespace AccountFinance
             date_acc.SelectedDate = new DateTime?(DateTime.Now);
             
             acc_list = dataAccess.Load_acc_db();
-            
             if (acc_list != null)
             {
                 foreach (account acc in acc_list)
@@ -56,8 +55,9 @@ namespace AccountFinance
         {
             if (acc_id_name.ContainsKey(slno_inp))
             {
-                string date = date_acc.SelectedDate.Value.ToString("dd-MM-yyyy");
-                
+                string[] date_split = date_acc.SelectedDate.Value.ToString("dd-MM-yyyy").Split('-');
+                string date = new DateTime(Int32.Parse(date_split[2]), Int32.Parse(date_split[1]), Int32.Parse(date_split[0])).Ticks.ToString();
+
                 List<int> slno_info = dataAccess.Load_Partys();
                 
                 if (slno_info != null && slno_combo.SelectedValue != null)

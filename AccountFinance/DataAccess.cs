@@ -50,18 +50,18 @@ namespace AccountFinance
                             while (sqLiteDataReader.Read())
                             {
                                 string str = (sqLiteDataReader.GetString(1));
-                                int num = 0;
+                                long num = 0;
                                 try
                                 {
-                                    num = int.Parse(sqLiteDataReader.GetString(1));
+                                    num = long.Parse(sqLiteDataReader.GetString(1));
+                                    continue;
                                 }
                                 catch (Exception)
                                 {
-                                    continue;
+                                    string[] strArray = str.Split('-');
+                                    DateTime dateTime = new DateTime(int.Parse(strArray[2]), int.Parse(strArray[1]), int.Parse(strArray[0]));
+                                    dictionary.Add(sqLiteDataReader.GetString(0), dateTime.Ticks.ToString());
                                 }
-                                string[] strArray = str.Split('-');
-                                DateTime dateTime = new DateTime(int.Parse(strArray[2]), int.Parse(strArray[1]), int.Parse(strArray[0]));
-                                dictionary.Add(sqLiteDataReader.GetString(0), dateTime.Ticks.ToString());
                             }
                         }
                     }
@@ -83,7 +83,51 @@ namespace AccountFinance
                         }
                     }
                 }
-              sqLiteConnection.Close();
+                Dictionary<string, string> dictionary_rec = new Dictionary<string, string>();
+                using (SQLiteCommand sqLiteCommand = new SQLiteCommand("Select posting_id, date from records", sqLiteConnection))
+                {
+                    using (SQLiteDataReader sqLiteDataReader = sqLiteCommand.ExecuteReader())
+                    {
+                        if (sqLiteDataReader.HasRows)
+                        {
+                            while (sqLiteDataReader.Read())
+                            {
+                                string str = (sqLiteDataReader.GetString(1));
+                                long num = 0;
+                                try
+                                {
+                                    num = long.Parse(sqLiteDataReader.GetString(1));
+                                    continue;
+                                }
+                                catch (Exception)
+                                {
+                                    string[] strArray = str.Split('-');
+                                    DateTime dateTime = new DateTime(int.Parse(strArray[2]), int.Parse(strArray[1]), int.Parse(strArray[0]));
+                                    dictionary_rec.Add(sqLiteDataReader.GetString(0), dateTime.Ticks.ToString());
+                                }
+                            }
+                        }
+                    }
+                }
+                using (SQLiteCommand sqLiteCommand = new SQLiteCommand("Update records set date=@Entry where posting_id=@Entry1", sqLiteConnection))
+                {
+                    foreach (string key in dictionary_rec.Keys)
+                    {
+                        sqLiteCommand.Parameters.AddWithValue("@Entry", (object)dictionary_rec[key]);
+                        sqLiteCommand.Parameters.AddWithValue("@Entry1", (object)key);
+                        try
+                        {
+                            sqLiteCommand.ExecuteNonQuery();
+                        }
+                        catch (Exception)
+                        {
+                            int num = (int)MessageBox.Show("Error");
+                            break;
+                        }
+                    }
+                }
+
+                sqLiteConnection.Close();
             }
         }
 
@@ -605,7 +649,10 @@ namespace AccountFinance
             {
                 return new Decimal[2] { 0, 0 };
             }
-            
+
+            date_t = new DateTime(long.Parse(date_t)).ToString("dd-MM-yyyy");
+            date = new DateTime(long.Parse(date)).ToString("dd-MM-yyyy");
+
             string[] strArray1 = date_t.Split('-');
             string[] strArray2 = date.Split('-');
 
@@ -635,7 +682,11 @@ namespace AccountFinance
                 switch (trail_b)
                 {
                     case 1:
-                        using (SQLiteDataReader sqLiteDataReader = new SQLiteCommand("Select reciept_amt, name, payment_amt, slno, share, type from accounts order by type", connection).ExecuteReader())
+                        string[] date_split_1 = date_t.Split('-');
+                        long datetick_1 = new DateTime(Int32.Parse(date_split_1[2]), Int32.Parse(date_split_1[1]), Int32.Parse(date_split_1[0])).Ticks;
+
+                        date_t = "" + datetick_1;
+                        using (SQLiteDataReader sqLiteDataReader = new SQLiteCommand("Select sum(r.reciept), a.name, sum(r.payment), r.slno, a.share, a.type from accounts a, records r where r.slno == a.slno and r.date<='"+ date_t +"' Group By r.name order by type", connection).ExecuteReader())
                         {
                             if (sqLiteDataReader.HasRows)
                             {
@@ -665,104 +716,111 @@ namespace AccountFinance
                         break;
                         */
                     case 2:
-                        Decimal num1 = new Decimal();
-                        Decimal num2 = new Decimal();
-
-                        using (SQLiteDataReader sqLiteDataReader2 = new SQLiteCommand("Select reciept_amt, payment_amt from accounts where type='Sadhar'", connection).ExecuteReader())
+                        if(date_t != "")
                         {
-                            if (sqLiteDataReader2.HasRows)
+                            string[] date_split = date_t.Split('-');
+                            long datetick = new DateTime(Int32.Parse(date_split[2]), Int32.Parse(date_split[1]), Int32.Parse(date_split[0])).Ticks;
+
+                            date_t = "" + datetick;
+
+                            Decimal num1 = new Decimal();
+                            Decimal num2 = new Decimal();
+
+                            using (SQLiteDataReader sqLiteDataReader2 = new SQLiteCommand("SELECT r.reciept, r.payment from accounts a, records r where r.slno == a.slno and a.type='Sadhar' and r.date<='" + date_t+ "'", connection).ExecuteReader())
                             {
-                                while (sqLiteDataReader2.Read())
-                                    num1 += Math.Abs(sqLiteDataReader2.GetDecimal(0) - sqLiteDataReader2.GetDecimal(1));
-                            }
-                            sqLiteDataReader2.Close();
-                        }
-
-                        using (SQLiteDataReader sqLiteDataReader3 = new SQLiteCommand("Select reciept_amt, payment_amt from accounts where type='Profit'", connection).ExecuteReader())
-                        {
-                            if (sqLiteDataReader3.HasRows)
-                            {
-                                while (sqLiteDataReader3.Read())
-                                    num2 += sqLiteDataReader3.GetDecimal(0) - sqLiteDataReader3.GetDecimal(1);
-                            }
-                            sqLiteDataReader3.Close();
-                        }
-
-                        Decimal int_bal = Math.Round(num2 - num1, 2);
-                        Decimal num3 = new Decimal();
-                        Dictionary<string, Decimal> dictionary = new Dictionary<string, Decimal>();
-
-                        HashSet<int> intSet = new HashSet<int>();
-
-                        using (SQLiteDataReader sqLiteDataReader4 = new SQLiteCommand("SELECT r.slno,r.name,r.date,r.reciept, r.payment, a.interest_rate from records r, accounts a where r.slno = a.slno and a.type IN ('Capital') order by r.name;", connection).ExecuteReader())
-                        {
-                            if (sqLiteDataReader4.HasRows)
-                            {
-                                while (sqLiteDataReader4.Read())
-                                    intSet.Add(sqLiteDataReader4.GetInt32(0));
-
-                                foreach (int num4 in intSet)
-                                    dictionary.Add(num4.ToString(), Decimal.Zero);
-
-                                using(SQLiteDataReader sqLiteDataReader5 = new SQLiteCommand("SELECT r.slno,r.name,r.date,r.reciept, r.payment, a.interest_rate, r.details from records r, accounts a where r.slno = a.slno and a.type IN ('Capital') order by r.name;", connection).ExecuteReader())
+                                if (sqLiteDataReader2.HasRows)
                                 {
-                                    if (sqLiteDataReader5.HasRows)
+                                    while (sqLiteDataReader2.Read())
+                                        num1 += sqLiteDataReader2.GetDecimal(0) - sqLiteDataReader2.GetDecimal(1);
+                                }
+                                sqLiteDataReader2.Close();
+                            }
+
+                            using (SQLiteDataReader sqLiteDataReader3 = new SQLiteCommand("SELECT r.reciept, r.payment from accounts a, records r where r.slno == a.slno and a.type='Profit' and r.date<='" + date_t + "'", connection).ExecuteReader())
+                            {
+                                if (sqLiteDataReader3.HasRows)
+                                {
+                                    while (sqLiteDataReader3.Read())
+                                        num2 += sqLiteDataReader3.GetDecimal(0) - sqLiteDataReader3.GetDecimal(1);
+                                }
+                                sqLiteDataReader3.Close();
+                            }
+
+                            Decimal int_bal = Math.Round(num2 - num1, 2);
+                            Decimal num3 = new Decimal();
+                            Dictionary<string, Decimal> dictionary = new Dictionary<string, Decimal>();
+
+                            HashSet<int> intSet = new HashSet<int>();
+
+                            using (SQLiteDataReader sqLiteDataReader4 = new SQLiteCommand("SELECT r.slno,r.name,r.date,r.reciept, r.payment, a.interest_rate from records r, accounts a where r.slno = a.slno and a.type IN ('Capital') and r.date<='" + date_t + "' order by a.name;", connection).ExecuteReader())
+                            {
+                                if (sqLiteDataReader4.HasRows)
+                                {
+                                    while (sqLiteDataReader4.Read())
+                                        intSet.Add(sqLiteDataReader4.GetInt32(0));
+
+                                    foreach (int num4 in intSet)
+                                        dictionary.Add(num4.ToString(), Decimal.Zero);
+
+                                    using (SQLiteDataReader sqLiteDataReader5 = new SQLiteCommand("SELECT r.slno, r.name, r.date, r.reciept, r.payment, a.interest_rate, r.details, a.type from records r, accounts a where r.slno = a.slno and a.type IN ('Capital') and r.date<='" + date_t + "' order by a.name;", connection).ExecuteReader())
                                     {
-                                        while (sqLiteDataReader5.Read())
+                                        if (sqLiteDataReader5.HasRows)
                                         {
-                                            Decimal[] numArray = Compute_int(sqLiteDataReader5.GetString(2), sqLiteDataReader5.GetDecimal(3), sqLiteDataReader5.GetDecimal(4), sqLiteDataReader5.GetDecimal(5), date_t, sqLiteDataReader5.GetString(6));
-                                            
-                                            if (dictionary.ContainsKey(sqLiteDataReader5.GetInt32(0).ToString()))
-                                                dictionary[sqLiteDataReader5.GetInt32(0).ToString()] += numArray[0] - numArray[1];
+                                            while (sqLiteDataReader5.Read())
+                                            {
+                                                Decimal[] numArray = Compute_int(sqLiteDataReader5.GetString(2), sqLiteDataReader5.GetDecimal(3), sqLiteDataReader5.GetDecimal(4), sqLiteDataReader5.GetDecimal(5), date_t, sqLiteDataReader5.GetString(6));
+
+                                                if (dictionary.ContainsKey(sqLiteDataReader5.GetInt32(0).ToString()))
+                                                    dictionary[sqLiteDataReader5.GetInt32(0).ToString()] += numArray[0] - numArray[1];
+                                            }
                                         }
+
+                                        sqLiteDataReader5.Close();
                                     }
 
-                                    sqLiteDataReader5.Close();
+                                    foreach (KeyValuePair<string, Decimal> keyValuePair in dictionary)
+                                        num3 += keyValuePair.Value;
+
+                                    int_bal -= num3;
+                                    int_bal = Math.Round(int_bal, 2);
+
                                 }
-
-                                foreach (KeyValuePair<string, Decimal> keyValuePair in dictionary)
-                                    num3 += keyValuePair.Value;
-
-                                int_bal -= num3;
-                                int_bal = Math.Round(int_bal, 2);
-
+                                sqLiteDataReader4.Close();
                             }
-                            sqLiteDataReader4.Close();
-                        }
 
-                        using (SQLiteDataReader sqLiteDataReader = new SQLiteCommand("Select name, reciept_amt, payment_amt, interest_rate, type, slno, share from accounts where type IN ('Partys')", connection).ExecuteReader())
-                        {
-                            if ((sqLiteDataReader).HasRows)
+                            using (SQLiteDataReader sqLiteDataReader = new SQLiteCommand("Select a.name, sum(r.reciept), sum(r.payment), a.interest_rate, a.type, a.slno, a.share from accounts a, records r where a.type=='Partys' and r.slno == a.slno and r.date<='" + date_t + "' GROUP BY a.name", connection).ExecuteReader())
                             {
-                                while ((sqLiteDataReader).Read())
-                                    accountList.Add(new account((sqLiteDataReader).GetDecimal(1), (sqLiteDataReader).GetString(0), (sqLiteDataReader).GetDecimal(2), (sqLiteDataReader).GetInt32(5), (sqLiteDataReader).GetInt32(6), (sqLiteDataReader).GetString(4)));
-                            }
-                            (sqLiteDataReader).Close();
-                        }
-                        using (SQLiteDataReader sqLiteDataReader = new SQLiteCommand("Select name, reciept_amt, payment_amt, interest_rate, type, slno, share from accounts where type IN ('Capital','Chits')", connection).ExecuteReader())
-                        {
-                            if ((sqLiteDataReader).HasRows)
-                            {
-                                while ((sqLiteDataReader).Read())
+                                if ((sqLiteDataReader).HasRows)
                                 {
-                                    accountList.Add(new account((sqLiteDataReader).GetDecimal(1), (sqLiteDataReader).GetString(0), (sqLiteDataReader).GetDecimal(2), (sqLiteDataReader).GetInt32(5), (sqLiteDataReader).GetInt32(6), (sqLiteDataReader).GetString(4)));
-                                    if (sqLiteDataReader.GetDecimal(3) > Decimal.Zero && sqLiteDataReader.GetString(4) == "Capital")
+                                    while ((sqLiteDataReader).Read())
+                                        accountList.Add(new account((sqLiteDataReader).GetDecimal(1), (sqLiteDataReader).GetString(0), (sqLiteDataReader).GetDecimal(2), (sqLiteDataReader).GetInt32(5), (sqLiteDataReader).GetInt32(6), (sqLiteDataReader).GetString(4)));
+                                }
+                                (sqLiteDataReader).Close();
+                            }
+                            using (SQLiteDataReader sqLiteDataReader = new SQLiteCommand("Select a.name, sum(r.reciept), sum(r.payment), a.interest_rate, a.type, a.slno, a.share from accounts a, records r where a.type IN ('Capital', 'Chits') and r.slno == a.slno and r.date<='" + date_t + "' GROUP BY a.name", connection).ExecuteReader())
+                            {
+                                if ((sqLiteDataReader).HasRows)
+                                {
+                                    while ((sqLiteDataReader).Read())
                                     {
-                                        if(dictionary.ContainsKey(sqLiteDataReader.GetInt32(5).ToString()))
+                                        accountList.Add(new account((sqLiteDataReader).GetDecimal(1), (sqLiteDataReader).GetString(0), (sqLiteDataReader).GetDecimal(2), (sqLiteDataReader).GetInt32(5), (sqLiteDataReader).GetInt32(6), (sqLiteDataReader).GetString(4)));
+                                        if (sqLiteDataReader.GetDecimal(3) > Decimal.Zero && sqLiteDataReader.GetString(4) == "Capital")
                                         {
-                                            string name = (sqLiteDataReader).GetString(0) + "-Interest";
-                                            string index = (sqLiteDataReader).GetInt32(5).ToString();
-                                            account account = new account(name, Math.Round(dictionary[index], 2), (sqLiteDataReader).GetInt32(5));
-                                            accountList.Add(account);
+                                            if (dictionary.ContainsKey(sqLiteDataReader.GetInt32(5).ToString()))
+                                            {
+                                                string name = (sqLiteDataReader).GetString(0) + "-Interest";
+                                                string index = (sqLiteDataReader).GetInt32(5).ToString();
+                                                account account = new account(name, Math.Round(dictionary[index], 2), (sqLiteDataReader).GetInt32(5));
+                                                accountList.Add(account);
+                                            }
                                         }
                                     }
+                                    accountList.Add(new account("PROFIT", int_bal, -5));
+                                    break;
                                 }
-                                accountList.Add(new account("PROFIT", int_bal, -5));
-                                break;
                             }
                         }
                         break;
-
                     default:
                         if (type == "Partys")
                         {
@@ -1293,14 +1351,27 @@ namespace AccountFinance
                 connection.Open();
                 SQLiteCommand sqLiteCommand = new SQLiteCommand();
 
-                if (sl_inp == "" && date != "" && name == "")
-                    sqLiteCommand = new SQLiteCommand("Select * from records where date='" + date + "';", connection);
-                else if (sl_inp != "" && date != "" && name == "")
-                    sqLiteCommand = new SQLiteCommand("Select * from records where slno=" + sl_inp, connection);
-                else if (name != "" && date != "" && sl_inp == "")
-                    sqLiteCommand = new SQLiteCommand("Select * from records where name LIKE'%" + name+"%';", connection);
-                else if (sl_inp != "" & p && date != "")
-                    sqLiteCommand = new SQLiteCommand("Select * from records where slno =" + sl_inp + " and date='" + date + "';", connection);
+                if (!p)
+                {
+                    if (sl_inp == "" && date != "" && name == "")
+                        sqLiteCommand = new SQLiteCommand("Select * from records where date='" + date + "';", connection);
+                    else if (sl_inp != "" && date != "" && name == "")
+                        sqLiteCommand = new SQLiteCommand("Select * from records where slno=" + sl_inp + " and date<='" + date + "'", connection);
+                    else if (name != "" && date != "" && sl_inp == "")
+                        sqLiteCommand = new SQLiteCommand("Select * from records where name LIKE'%" + name + "%' and date<='" + date + "';", connection);
+
+                }
+                else
+                {
+                    if (sl_inp == "" && name == "")
+                        sqLiteCommand = new SQLiteCommand("Select * from records where date='" + date + "';", connection);
+                    else if (sl_inp != "" && date != "")
+                        sqLiteCommand = new SQLiteCommand("Select * from records where slno =" + sl_inp + " and date='" + date + "';", connection);
+                    else if (name != "" && date != "")
+                        sqLiteCommand = new SQLiteCommand("Select * from records where name =" + name + " and date='" + date + "';", connection);
+                    else if (sl_inp != "" && date != "" && name != "")
+                        sqLiteCommand = new SQLiteCommand("Select * from records where slno =" + sl_inp + " and date='" + date + "';", connection);
+                }
 
                 using (SQLiteDataReader sqLiteDataReader = sqLiteCommand.ExecuteReader())
                 {
@@ -1560,6 +1631,28 @@ namespace AccountFinance
         public string Get_last_postingDate()
         {
             string last_date = "";
+            using(SQLiteConnection con = new SQLiteConnection("Data source=" + db_path))
+            {
+                con.Open();
+                using(SQLiteCommand check_Cmd = new SQLiteCommand("Select date from records order by date DESC Limit 1", con))
+                {
+                    using (SQLiteDataReader reader_ = check_Cmd.ExecuteReader())
+                    {
+                        if (reader_.HasRows)
+                        {
+                            while (reader_.Read())
+                            {
+                                last_date = new DateTime(long.Parse(reader_.GetString(0))).ToString("dd-MM-yyyy");
+                            }
+                        }
+                    }
+                }
+                con.Close();
+            }
+            if (last_date == "")
+                last_date = "No Posting Done";
+
+            /*
             List<DateTime> dt = new List<DateTime>();
             using (SQLiteConnection con = new SQLiteConnection("Data source=" + db_path))
             {
@@ -1593,6 +1686,8 @@ namespace AccountFinance
 
             if(last_date  == "01-01-0001")
                 last_date = "No Posting Done";
+
+            */
             return last_date;
         }
 
@@ -1605,10 +1700,18 @@ namespace AccountFinance
             {
                 con.Open();
 
-                using(SQLiteCommand schCmd = new SQLiteCommand("Select date from records where slno='"+slno+"'", con))
+                using(SQLiteCommand schCmd = new SQLiteCommand("Select date from records where slno='"+slno+"' order by date DESC Limit 2", con))
                 {
                     using(SQLiteDataReader reader_ = schCmd.ExecuteReader())
                     {
+                        if (reader_.HasRows)
+                        {
+                            while (reader_.Read())
+                            {
+                                prev_post_date = new DateTime(long.Parse(reader_.GetString(0))).ToString("dd-MM-yyyy");
+                            }
+                        }
+                        /*
                         if (reader_.HasRows)
                         {
                             string[] date_split;
@@ -1620,12 +1723,12 @@ namespace AccountFinance
                                     dt.Add(new DateTime(int.Parse(date_split[2]), int.Parse(date_split[1]), int.Parse(date_split[0])));
                                 }
                             }
-                        }
+                        }*/
                     }
                 }
                 con.Close();
             }
-
+            /*
             DateTime max = DateTime.MinValue;
             foreach (DateTime d in dt)
             {
@@ -1637,7 +1740,7 @@ namespace AccountFinance
 
             if (prev_post_date == "01-01-0001")
                 prev_post_date = "";
-
+            */
             return prev_post_date;
         }
         
@@ -1684,8 +1787,9 @@ namespace AccountFinance
 
                 using (SQLiteCommand insertCmd = new SQLiteCommand("INSERT INTO post_temp(posting_id, date, slno, name, details, reciept, payment, interest, acc_id) VALUES(@Entry, @Entry1, @Entry2, @Entry3, @Entry4, @Entry5, @Entry6, @Entry7, @Entry8)", con))
                 {
+                    string[] date_split = rec.date.Split('-');
                     insertCmd.Parameters.AddWithValue("@Entry", rec.posting_id);
-                    insertCmd.Parameters.AddWithValue("@Entry1", rec.date);
+                    insertCmd.Parameters.AddWithValue("@Entry1", new DateTime(Int32.Parse(date_split[2]), Int32.Parse(date_split[1]), Int32.Parse(date_split[0])).Ticks.ToString());
                     insertCmd.Parameters.AddWithValue("@Entry2", rec.slno);
                     insertCmd.Parameters.AddWithValue("@Entry3", rec.name);
                     insertCmd.Parameters.AddWithValue("@Entry4", rec.details);

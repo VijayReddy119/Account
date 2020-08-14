@@ -55,7 +55,8 @@ namespace AccountFinance
         private void Acc_Disp_Load(string slno_inp)
         {
             Reset_Details();
-            string date = date_acc.SelectedDate.Value.ToString("dd-MM-yyyy");
+            string[] date_spli = date_acc.SelectedDate.Value.ToString("dd-MM-yyyy").Split('-');
+            string date = new DateTime(Int32.Parse(date_spli[2]), Int32.Parse(date_spli[1]), Int32.Parse(date_spli[0])).Ticks.ToString();
             Decimal interest_rate = new Decimal();
             foreach (account account in account)
             {

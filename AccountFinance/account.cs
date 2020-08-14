@@ -37,7 +37,7 @@ namespace AccountFinance
             this.acc_id = acc_id;
             this.slno = slno;
             this.name = name;
-            this.date = date;
+            this.date = new DateTime(long.Parse(date)).ToString("dd-MM-yyyy");
             this.village = village;
             this.type = type;
             this.interest = interest;
@@ -49,7 +49,7 @@ namespace AccountFinance
             this.acc_id = acc_id;
             this.slno = slno;
             this.name = name;
-            this.date = date;
+            this.date = new DateTime(long.Parse(date)).ToString("dd-MM-yyyy");
             this.village = village;
             this.type = type;
             this.interest = interest;
@@ -64,7 +64,7 @@ namespace AccountFinance
             this.acc_id = acc_id;
             this.slno = slno;
             this.name = name;
-            this.date = date;
+            this.date = new DateTime(long.Parse(date)).ToString("dd-MM-yyyy");
             this.village = village;
             this.type = type;
             this.interest = interest;
@@ -79,7 +79,7 @@ namespace AccountFinance
         {
             this.slno = slno;
             this.name = name;
-            this.date = date;
+            this.date = new DateTime(long.Parse(date)).ToString("dd-MM-yyyy");
             this.village = village;
             this.type = type;
             this.interest = interest;
@@ -91,7 +91,7 @@ namespace AccountFinance
 
         public account(string date,int slno,string name,string village,Decimal reciept,Decimal payment,Decimal balance,Decimal interest,int share)
         {
-            this.date = date;
+            this.date = new DateTime(long.Parse(date)).ToString("dd-MM-yyyy");
             this.slno = slno;
             this.name = name;
             this.village = village;
@@ -106,7 +106,7 @@ namespace AccountFinance
         {
             this.slno = slno;
             this.name = name;
-            this.date = date;
+            this.date = new DateTime(long.Parse(date)).ToString("dd-MM-yyyy");
             this.reciept = Math.Round(reciept, 2);
             this.payment = Math.Round(payment, 2);
             this.balance = reciept - payment;

@@ -25,7 +25,7 @@
             <Button Click="trail_bal_Click" Name="trail_bal" Content="Trail Balance" Height="30" Margin="0 12 0 0"/>
             <Button Click="daily_posting_list_Click" Name="daily_posting_list" Content="Daily Posting" Height="30" Margin="0 12 0 0"/>
             <Button Click="close_Click" Name="close" Content="Closing" Height="30" Margin="0 12 0 0"/>
-            <Image Height="256" Margin="0,20,8,0" Source="20541-NT0XXW.ico"/>
+            <Image Height="256" Margin="0,20,8,0" Source="sai-baba-2.ico"/>
         </StackPanel>
         <Frame x:Name="frameMainContent" Grid.Column="1" NavigationUIVisibility="Hidden" Source="{Binding}"/>
     </Grid>

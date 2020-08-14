@@ -222,10 +222,11 @@ namespace AccountFinance
                 decimal num5 = random.Next();
                 strArray[4] = num5.ToString();
                 string str1 = string.Concat(strArray);
-
+                string[] date_split = date_post.SelectedDate.Value.ToString("dd-MM-yyyy").Split('-');
+                string str_date = new DateTime(Int32.Parse(date_split[2]), Int32.Parse(date_split[1]), Int32.Parse(date_split[0])).Ticks + "";
                 inpData.Add(str1);
 
-                inpData.Add(date_post.SelectedDate.Value.ToString("dd-MM-yyyy"));
+                inpData.Add(str_date);
                 inpData.Add(slno_post_combo.Text);
                 inpData.Add(name_post_combo.Text);
                 inpData.Add("" + description_post.Text);
@@ -255,7 +256,7 @@ namespace AccountFinance
                     
                     List<string> profit_data = new List<string>();
                     profit_data.Add(profitAccount.name.Substring(0, profitAccount.name.Length / 3) + "-" + profitAccount.slno + "-" + random.Next().ToString());
-                    profit_data.Add(date_post.SelectedDate.Value.ToString("dd-MM-yyyy"));
+                    profit_data.Add(str_date);
                     profit_data.Add(profitAccount.slno.ToString());
                     profit_data.Add(profitAccount.name);
                     profit_data.Add(description_post.Text);
@@ -528,8 +529,10 @@ namespace AccountFinance
                         {
                             List<string> inpdata = new List<string>();
 
+                            string[] date_split = x.date.Split('-');
+
                             inpdata.Add(x.posting_id);
-                            inpdata.Add(x.date);
+                            inpdata.Add(new DateTime(Int32.Parse(date_split[2]), Int32.Parse(date_split[1]), Int32.Parse(date_split[0])).Ticks.ToString());
                             inpdata.Add(x.slno.ToString());
                             inpdata.Add(x.name);
                             inpdata.Add(x.details);

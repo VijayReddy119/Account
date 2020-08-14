@@ -31,7 +31,7 @@
         <DataGrid x:Name="Output" Grid.Row="2" HorizontalAlignment="Center" Width="780" Height="200" FontSize="18"
               FontWeight="DemiBold" AutoGenerateColumns="false">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Date" Width="80" Binding="{Binding date}">
+                <DataGridTextColumn Header="Date" Width="100" Binding="{Binding date}">
                     <DataGridColumn.HeaderStyle>
                         <Style TargetType="{x:Type DataGridColumnHeader}">
                             <Setter Property="Control.HorizontalContentAlignment" Value="Center"/>

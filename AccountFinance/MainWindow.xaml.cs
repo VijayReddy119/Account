@@ -21,6 +21,7 @@ namespace AccountFinance
             Thread.CurrentThread.CurrentCulture.DateTimeFormat.ShortDatePattern = "dd-MM-yyyy";
 
             Line_no.Text = DataAccess.GetDbName();
+            dataAccess.ModifyTableData();
         }
         public static void Set_InpSend(List<string> inp)
         {

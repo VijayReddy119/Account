@@ -242,7 +242,8 @@ namespace AccountFinance
                 string text2 = name.Text;
                 string str1 = text2.Substring(0, text2.Length / 2) + "-" + random.Next().ToString();
                 string text3 = acc_type.Text;
-                string str2 = date_new.SelectedDate.Value.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture);
+                string[] date_split = date_new.SelectedDate.Value.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture).Split('-') ;
+                string str2 = new DateTime(Int32.Parse(date_split[2]), Int32.Parse(date_split[1]), Int32.Parse(date_split[0])).Ticks.ToString();
                 if (str3 == "")
                     str3 = "0";
                 if (!dataAccess.Save_toDB(new List<string>()
