@@ -871,6 +871,7 @@
                               <Value>=Sum(Decimal.Parse(Fields!reciept.Value))</Value>
                               <Style>
                                 <FontWeight>Bold</FontWeight>
+                                <Color>Red</Color>
                               </Style>
                             </TextRun>
                           </TextRuns>
@@ -905,6 +906,7 @@
                               <Value>=Sum(Decimal.Parse(Fields!payment.Value))</Value>
                               <Style>
                                 <FontWeight>Bold</FontWeight>
+                                <Color>Red</Color>
                               </Style>
                             </TextRun>
                           </TextRuns>
@@ -939,6 +941,7 @@
                               <Value>=Sum(Decimal.Parse(Fields!interest.Value))</Value>
                               <Style>
                                 <FontWeight>Bold</FontWeight>
+                                <Color>Red</Color>
                               </Style>
                             </TextRun>
                           </TextRuns>

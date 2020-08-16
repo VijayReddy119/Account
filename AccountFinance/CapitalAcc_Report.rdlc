@@ -849,6 +849,7 @@
                               <Style>
                                 <FontSize>12pt</FontSize>
                                 <FontWeight>Bold</FontWeight>
+                                <Color>Red</Color>
                               </Style>
                             </TextRun>
                           </TextRuns>
@@ -884,6 +885,7 @@
                               <Style>
                                 <FontSize>12pt</FontSize>
                                 <FontWeight>Bold</FontWeight>
+                                <Color>Red</Color>
                               </Style>
                             </TextRun>
                           </TextRuns>
@@ -919,6 +921,7 @@
                               <Style>
                                 <FontSize>12pt</FontSize>
                                 <FontWeight>Bold</FontWeight>
+                                <Color>Red</Color>
                               </Style>
                             </TextRun>
                           </TextRuns>
@@ -954,6 +957,7 @@
                               <Style>
                                 <FontSize>12pt</FontSize>
                                 <FontWeight>Bold</FontWeight>
+                                <Color>Red</Color>
                               </Style>
                             </TextRun>
                           </TextRuns>

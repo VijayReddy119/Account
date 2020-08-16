@@ -673,6 +673,7 @@
                               <Style>
                                 <FontSize>11pt</FontSize>
                                 <FontWeight>Bold</FontWeight>
+                                <Color>CornflowerBlue</Color>
                               </Style>
                             </TextRun>
                           </TextRuns>
@@ -708,6 +709,7 @@
                               <Style>
                                 <FontSize>11pt</FontSize>
                                 <FontWeight>Bold</FontWeight>
+                                <Color>CornflowerBlue</Color>
                               </Style>
                             </TextRun>
                           </TextRuns>
@@ -938,6 +940,7 @@
                               <Style>
                                 <FontSize>11pt</FontSize>
                                 <FontWeight>Bold</FontWeight>
+                                <Color>Red</Color>
                               </Style>
                             </TextRun>
                           </TextRuns>
@@ -973,6 +976,7 @@
                               <Style>
                                 <FontSize>11pt</FontSize>
                                 <FontWeight>Bold</FontWeight>
+                                <Color>Red</Color>
                               </Style>
                             </TextRun>
                           </TextRuns>
@@ -1008,6 +1012,7 @@
                               <Style>
                                 <FontSize>11pt</FontSize>
                                 <FontWeight>Bold</FontWeight>
+                                <Color>Red</Color>
                               </Style>
                             </TextRun>
                           </TextRuns>
@@ -1043,6 +1048,7 @@
                               <Style>
                                 <FontSize>11pt</FontSize>
                                 <FontWeight>Bold</FontWeight>
+                                <Color>Red</Color>
                               </Style>
                             </TextRun>
                           </TextRuns>

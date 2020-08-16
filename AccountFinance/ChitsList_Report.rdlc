@@ -868,6 +868,7 @@
                               <Value>=Count(Fields!slno.Value)</Value>
                               <Style>
                                 <FontWeight>ExtraBold</FontWeight>
+                                <Color>Red</Color>
                               </Style>
                             </TextRun>
                           </TextRuns>
@@ -888,6 +889,7 @@
                         <PaddingBottom>2pt</PaddingBottom>
                       </Style>
                     </Textbox>
+                    <rd:Selected>true</rd:Selected>
                   </CellContents>
                 </TablixCell>
                 <TablixCell>
@@ -932,6 +934,7 @@
                               <Value>=Sum(Decimal.Parse(Fields!reciept.Value))</Value>
                               <Style>
                                 <FontWeight>Bold</FontWeight>
+                                <Color>Red</Color>
                               </Style>
                             </TextRun>
                           </TextRuns>
@@ -952,6 +955,7 @@
                         <PaddingBottom>2pt</PaddingBottom>
                       </Style>
                     </Textbox>
+                    <rd:Selected>true</rd:Selected>
                   </CellContents>
                 </TablixCell>
                 <TablixCell>
@@ -966,6 +970,7 @@
                               <Value>=Sum(Decimal.Parse(Fields!payment.Value))</Value>
                               <Style>
                                 <FontWeight>Bold</FontWeight>
+                                <Color>Red</Color>
                               </Style>
                             </TextRun>
                           </TextRuns>
@@ -986,6 +991,7 @@
                         <PaddingBottom>2pt</PaddingBottom>
                       </Style>
                     </Textbox>
+                    <rd:Selected>true</rd:Selected>
                   </CellContents>
                 </TablixCell>
                 <TablixCell>
@@ -1000,6 +1006,7 @@
                               <Value>=Sum(Decimal.Parse(Fields!balance.Value))</Value>
                               <Style>
                                 <FontWeight>Bold</FontWeight>
+                                <Color>Red</Color>
                               </Style>
                             </TextRun>
                           </TextRuns>
@@ -1020,6 +1027,7 @@
                         <PaddingBottom>2pt</PaddingBottom>
                       </Style>
                     </Textbox>
+                    <rd:Selected>true</rd:Selected>
                   </CellContents>
                 </TablixCell>
               </TablixCells>
