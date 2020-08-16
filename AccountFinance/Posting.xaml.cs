@@ -241,7 +241,7 @@ namespace AccountFinance
                 else
                     inpData.Add(payment_post.Text);
 
-                if (interest_post.Text == "")
+                if (interest_post.Text == "" || interest_post.Text == "0")
                     inpData.Add("0");
                 else
                 {

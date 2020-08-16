@@ -159,5 +159,10 @@ namespace AccountFinance
         {
             this.frameMainContent.Source = new Uri("ClosingList.xaml", UriKind.Relative);
         }
+
+        private void old_accounts_Click(object sender, RoutedEventArgs e)
+        {
+            this.frameMainContent.Source = new Uri("Old_accounts_display.xaml", UriKind.Relative);
+        }
     }
 }

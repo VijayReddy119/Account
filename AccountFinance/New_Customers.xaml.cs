@@ -436,7 +436,7 @@ namespace AccountFinance
             string text2 = name.Text;
             string upper = village.Text.ToUpper();
             string text3 = acc_type.Text;
-            string str1 = date_new.SelectedDate.Value.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture);
+            string str1 = date_new.SelectedDate.Value.Ticks.ToString();
             string str2 = interest_rate.Text;
             string text4 = share.Text;
             if (str2 == "")

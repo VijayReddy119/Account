@@ -11,12 +11,13 @@ namespace AccountFinance
     public partial class Trail_balance : Page
     {
         private DataAccess dataAccess = new DataAccess();
-        protected bool t_2 = false, t_3 = false;
         protected string t_ = "";
         private List<account> account_list = new List<account>();
+        private List<account> acc_int_share = new List<account>();
         public Trail_balance()
         {
             InitializeComponent();
+            t_ = "1";
             Load_data(1);
         }
 
@@ -78,6 +79,7 @@ namespace AccountFinance
             t_ = "1";
             trail_bal_txt.Text = "Trail Balance - 1";
             create_acc.Visibility = Visibility.Hidden;
+            load_Acc_Final.Visibility = Visibility.Hidden;
         }
 
         private void trail_bal_2_Click(object sender, RoutedEventArgs e)
@@ -86,6 +88,7 @@ namespace AccountFinance
             t_ = "2";
             trail_bal_txt.Text = "Trail Balance - 2";
             create_acc.Visibility = Visibility.Hidden;
+            load_Acc_Final.Visibility = Visibility.Hidden;
         }
 
         private void date_trail_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
@@ -132,6 +135,7 @@ namespace AccountFinance
         private List<account> show_Final_Acc(bool onlyCapital = false)
         {
             List<account> accountList = new List<account>();
+            acc_int_share = new List<account>();
             int num1 = 0;
             Dictionary<int, Dictionary<string, int>> dictionary1 = new Dictionary<int, Dictionary<string, int>>();
             int num2 = 0;
@@ -148,13 +152,10 @@ namespace AccountFinance
                 }
             }
             int num3 = 0;
-            int num4 = 0;
             for (int index = 0; index < account_list.Count - 1; ++index)
             {
                 if (account_list[index].type == "Partys")
                     num3 += (int)account_list[index].bal_neg;
-                else if (account_list[index].type == "Chits")
-                    num4 += (int)account_list[index].bal_neg;
                 else if (account_list[index].type == "Capital" && account_list[index].share >= 0)
                 {
                     accountList.Add(new account(account_list[index].bal_pos, account_list[index].name, account_list[index].bal_neg, account_list[index].slno, account_list[index].share, account_list[index].type));
@@ -165,6 +166,10 @@ namespace AccountFinance
                         int num5 = num2 * dictionary1[slno][name] / num1;
                         accountList.Add(new account(account_list[index + 1].bal_pos, name + " -Interest", Decimal.Zero, slno, 0, "Interest"));
                         accountList.Add(new account((Decimal)num5, name + " -Share (" + dictionary1[slno][name].ToString() + ")", Decimal.Zero, slno, 0, "SHARE"));
+
+                        acc_int_share.Add(new account(account_list[index + 1].bal_pos, name + " -Interest", Decimal.Zero, slno, 0, "Interest"));
+                        acc_int_share.Add(new account((Decimal)num5, name + " -Share (" + dictionary1[slno][name].ToString() + ")", Decimal.Zero, slno, 0, "SHARE"));
+
                         ++index;
                     }
                     else if (account_list[index].share > 0 && account_list[index].slno != account_list[index + 1].slno)
@@ -173,13 +178,24 @@ namespace AccountFinance
                         string name = account_list[index].name;
                         int num5 = num2 * dictionary1[slno][name] / num1;
                         accountList.Add(new account((Decimal)num5, name + " -Share", Decimal.Zero, slno, 0, "SHARE"));
+
+                        acc_int_share.Add(new account((Decimal)num5, name + " -Share", Decimal.Zero, slno, 0, "SHARE"));
                     }
                 }
             }
             if (onlyCapital)
                 return accountList;
+
             accountList.Add(new account(Decimal.Zero, "Partys", (Decimal)num3, -123, 0, "Partys"));
-            accountList.Add(new account(Decimal.Zero, "Chits", (Decimal)num4, -234, 0, "Chits"));
+
+            for (int index = 0; index < account_list.Count; ++index)
+            {
+                if (account_list[index].type == "Chits")
+                {
+                    accountList.Add(new account(account_list[index].bal_pos, account_list[index].name, account_list[index].bal_neg, account_list[index].slno, account_list[index].share, account_list[index].type));
+                }
+            }
+
             accountList.Add(new account(Decimal.Zero, "PROFIT", Decimal.Zero, -5, 0, "PROFIT"));
             return accountList;
         }
@@ -200,6 +216,7 @@ namespace AccountFinance
             t_ = "3";
             trail_bal_txt.Text = "FINAL account_list";
             create_acc.Visibility = Visibility.Visible;
+            load_Acc_Final.Visibility = Visibility.Visible;
         }
 
         private void t3_report_btn_Click(object sender, RoutedEventArgs e)
@@ -214,12 +231,21 @@ namespace AccountFinance
 
         private void create_acc_Click(object sender, RoutedEventArgs e)
         {
-            dataAccess.CreateAcc();
+            if (dataAccess.CreateAcc())
+            {
+                Load_data(1);
+                t_ = "1";
+                trail_bal_txt.Text = "Trail Balance - 1";
+                create_acc.Visibility = Visibility.Hidden;
+            }
+        }
 
-            Load_data(1);
-            t_ = "1";
-            trail_bal_txt.Text = "Trail Balance - 1";
-            create_acc.Visibility = Visibility.Hidden;
+        private void load_Acc_Final_Click(object sender, RoutedEventArgs e)
+        {
+            if (dataAccess.LoadFinalAcc(acc_int_share))
+            {
+                MessageBox.Show("Posted");
+            }
         }
 
         private void Capital_acc_Final_Click(object sender, RoutedEventArgs e)

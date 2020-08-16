@@ -1,12 +1,12 @@
-﻿<Page x:Class="AccountFinance.AccountsDisplay"
+﻿<Page x:Class="BHAGAVANDVSOFTWARE.Old_accounts_display"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:AccountFinance"
+      xmlns:local="clr-namespace:BHAGAVANDVSOFTWARE"
       mc:Ignorable="d" 
       Loaded="Page_Loaded"
-      Title="AccountsDisplay" Background="MediumPurple">
+      Title="Old Accounts Display" Background="MediumPurple">
     <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
@@ -15,7 +15,7 @@
             <RowDefinition Height="300"/>
             <RowDefinition Height="200"/>
         </Grid.RowDefinitions>
-        <TextBox Grid.Row="0" HorizontalAlignment="Center" Text="Account Display" TextWrapping="Wrap" VerticalAlignment="Top" Height="45" Width="auto" Foreground="White" FontSize="30" FontWeight="Bold" Background="{x:Null}"/>
+        <TextBox Grid.Row="0" HorizontalAlignment="Center" Text="Old Account Display" TextWrapping="Wrap" VerticalAlignment="Top" Height="45" Width="auto" Foreground="White" FontSize="30" FontWeight="Bold" Background="{x:Null}"/>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top">
             <Button Click="print_btn_Click" x:Name="print_btn" Content="Print" Width="100" Height="50"/>
             <DatePicker SelectedDateChanged="date_acc_SelectedDateChanged" x:Name="date_acc" Width="166" FontSize="22" Height="39"/>
@@ -48,45 +48,31 @@
                   FontSize="18" FontWeight="Bold" IsEditable="true" Padding="10"/>
             </StackPanel>
         </StackPanel>
-        <DataGrid x:Name="Output_data" Grid.Row="3" Margin="0 10 0 0" HorizontalAlignment="Center" Width="880" FontSize="18" FontWeight="DemiBold" AutoGenerateColumns="false">
+        <DataGrid x:Name="Output_data" Grid.Row="3" Margin="12,9.6,-16,0.4" HorizontalAlignment="Center" Width="604" FontSize="16" FontWeight="Bold" AutoGenerateColumns="false">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Date" Width="110" Binding="{Binding date}"/>
-                <DataGridTextColumn Header="Details" Width="170" Binding="{Binding details}"/>
-                <DataGridTextColumn Header="Days" Width="80" Binding="{Binding days}"/>
+                <DataGridTextColumn Header="Details" Width="200" Binding="{Binding details}"/>
                 <DataGridTextColumn Header="Reciept" Width="100" Binding="{Binding reciept}"/>
-                <DataGridTextColumn Header="Reciept Int" Width="100" Binding="{Binding reciept_int}"/>
                 <DataGridTextColumn Header="Payment" Width="100" Binding="{Binding payment}"/>
-                <DataGridTextColumn Header="Payment Int" Width="110" Binding="{Binding payment_int}"/>
                 <DataGridTextColumn Header="Interest" Width="80" Binding="{Binding interest}"/>
             </DataGrid.Columns>
         </DataGrid>
-        <Grid Row="4" HorizontalAlignment="Right">
+        <Grid Grid.Row="3" HorizontalAlignment="Right" Margin="0,299.6,12,0.4" Grid.RowSpan="2">
             <Grid.RowDefinitions>
-                <RowDefinition Height="60"/>
                 <RowDefinition Height="60"/>
                 <RowDefinition Height="60"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="100"/>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <TextBox x:Name="reciept_total_record" Width="100" Height="50" Padding="10" Grid.Row="0" Grid.Column="2" FontSize="18" FontWeight="Bold" IsReadOnly="true"/>
-            <TextBox x:Name="ri_total_record" Width="100" Height="50" Padding="10" Grid.Row="0" Grid.Column="3" FontSize="18" FontWeight="Bold" IsReadOnly="true"/>
-            <TextBox x:Name="payment_total_record" Width="100" Height="50" Padding="10" Grid.Row="0" Grid.Column="4" FontSize="18" FontWeight="Bold" IsReadOnly="true"/>
-            <TextBox x:Name="pi_total_record" Width="100" Height="50" Padding="10" Grid.Row="0" Grid.Column="5" FontSize="18" FontWeight="Bold" IsReadOnly="true"/>
-            <TextBox x:Name="pi_total_int" Width="100" Height="50" Padding="10" Grid.Row="0" Grid.Column="6" FontSize="18" FontWeight="Bold" IsReadOnly="true" />
-            <TextBlock Width="100" Text="Balance" Height="50" Grid.Row="1" Grid.Column="0" Foreground="White" Margin="-11,14.6,11,46.2" Grid.RowSpan="2"/>
-            <TextBox x:Name="balance_to_be_paid" Width="100" Height="50" Padding="10" Grid.Row="1" Margin="39,5.6,61,4.8" Grid.ColumnSpan="2" FontSize="18" FontWeight="Bold" IsReadOnly="true"/>
-            <TextBox x:Name="balance_rec_amt" Width="100" Height="50" Padding="10" Grid.Row="1" Grid.Column="2" Margin="0" FontSize="18" FontWeight="Bold" IsReadOnly="true"/>
-            <TextBox x:Name="balance_rec_int" Width="100" Height="50" Padding="10" Grid.Row="1" Grid.Column="3" FontSize="18" FontWeight="Bold" IsReadOnly="true"/>
-            <TextBlock Width="100" Text="Total+Int" Height="50" Grid.Row="2" Grid.Column="1" Foreground="White" Grid.ColumnSpan="2" Margin="46,26.2,54,-5.8"/>
-            <TextBox x:Name="principle_amt" Width="100" Height="50" Padding="10" Grid.Row="2" Grid.Column="2" FontSize="18" FontWeight="Bold" IsReadOnly="true"/>
-            <TextBox x:Name="interest_acc_disp" Width="100" Height="50" Padding="10" Grid.Row="2" Grid.Column="3" FontSize="18" FontWeight="Bold" IsReadOnly="true"/>
+            <TextBox x:Name="reciept_total_record" Width="100" Height="50" Padding="10" Grid.Row="0" Grid.Column="1" FontSize="18" FontWeight="Bold" IsReadOnly="true"/>
+            <TextBox x:Name="payment_total_record" Width="100" Height="50" Padding="10" Grid.Row="0" Grid.Column="2" FontSize="18" FontWeight="Bold" IsReadOnly="true"/>
+            <TextBox x:Name="total_int" Width="100" Height="50" Padding="10" Grid.Row="0" Grid.Column="3" FontSize="18" FontWeight="Bold" IsReadOnly="true" />
+            <TextBlock Width="100" Text="Total" Height="50" Grid.Row="1" Grid.Column="0" Foreground="White" FontSize="16" FontWeight="Bold"/>
+            <TextBox x:Name="total_balance" Width="150" Height="50" Padding="10" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" FontSize="18" FontWeight="Bold" IsReadOnly="true"/>
         </Grid>
     </Grid>
 </Page>

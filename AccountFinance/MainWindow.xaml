@@ -25,6 +25,8 @@
             <Button Click="trail_bal_Click" Name="trail_bal" Content="Trail Balance" Height="30" Margin="0 12 0 0"/>
             <Button Click="daily_posting_list_Click" Name="daily_posting_list" Content="Daily Posting" Height="30" Margin="0 12 0 0"/>
             <Button Click="close_Click" Name="close" Content="Closing" Height="30" Margin="0 12 0 0"/>
+            <Separator Height="2.5" Margin="0 12 0 0"/>
+            <Button Click="old_accounts_Click" Name="old_accounts" Content="*" Height="30" Width="30" HorizontalAlignment="Left" Background="White" Margin="0 5 0 0" BorderBrush="White"/>
             <Image Height="256" Margin="0,20,8,0" Source="sai-baba-2.ico"/>
         </StackPanel>
         <Frame x:Name="frameMainContent" Grid.Column="1" NavigationUIVisibility="Hidden" Source="{Binding}"/>

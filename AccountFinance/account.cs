@@ -147,5 +147,12 @@ namespace AccountFinance
             this.reciept = Math.Round(reciept, 2);
             this.payment = Math.Round(payment, 2);
         }
+
+        public account(string acc_id, string date_, string last_posting_date)
+        {
+            this.acc_id = acc_id;
+            this.date = date_;
+            this.last_posting_date = last_posting_date;
+        }
     }
 }

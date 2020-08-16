@@ -40,93 +40,104 @@ namespace AccountFinance
             using (SQLiteConnection sqLiteConnection = new SQLiteConnection("Data Source=" + DataAccess.db_path))
             {
                 sqLiteConnection.Open();
-                Dictionary<string, string> dictionary = new Dictionary<string, string>();
-                using (SQLiteCommand sqLiteCommand = new SQLiteCommand("Select acc_id, date from accounts", sqLiteConnection))
+
+                //Accounts Table Modify Date and Last_Posting_Date
+                List<account> acc_table = new List<account>();
+                using(SQLiteDataReader acc_read = new SQLiteCommand("Select acc_id, date, last_posting_date from accounts", sqLiteConnection).ExecuteReader())
                 {
-                    using (SQLiteDataReader sqLiteDataReader = sqLiteCommand.ExecuteReader())
+                    if (acc_read.HasRows)
                     {
-                        if (sqLiteDataReader.HasRows)
+                        while (acc_read.Read())
                         {
-                            while (sqLiteDataReader.Read())
+                            long date_c;
+                            if(long.TryParse(acc_read.GetString(1), out date_c))
                             {
-                                string str = (sqLiteDataReader.GetString(1));
-                                long num = 0;
-                                try
+                                long last_date_c;
+                                if(long.TryParse(acc_read.GetString(2), out last_date_c))
                                 {
-                                    num = long.Parse(sqLiteDataReader.GetString(1));
                                     continue;
                                 }
-                                catch (Exception)
-                                {
-                                    string[] strArray = str.Split('-');
-                                    DateTime dateTime = new DateTime(int.Parse(strArray[2]), int.Parse(strArray[1]), int.Parse(strArray[0]));
-                                    dictionary.Add(sqLiteDataReader.GetString(0), dateTime.Ticks.ToString());
-                                }
                             }
-                        }
-                    }
-                }
-                using (SQLiteCommand sqLiteCommand = new SQLiteCommand("Update accounts set date=@Entry where acc_id=@Entry1", sqLiteConnection))
-                {
-                    foreach (string key in dictionary.Keys)
-                    {
-                        sqLiteCommand.Parameters.AddWithValue("@Entry", (object)dictionary[key]);
-                        sqLiteCommand.Parameters.AddWithValue("@Entry1", (object)key);
-                        try
-                        {
-                            sqLiteCommand.ExecuteNonQuery();
-                        }
-                        catch (Exception)
-                        {
-                            int num = (int)MessageBox.Show("Error");
-                            break;
-                        }
-                    }
-                }
-                Dictionary<string, string> dictionary_rec = new Dictionary<string, string>();
-                using (SQLiteCommand sqLiteCommand = new SQLiteCommand("Select posting_id, date from records", sqLiteConnection))
-                {
-                    using (SQLiteDataReader sqLiteDataReader = sqLiteCommand.ExecuteReader())
-                    {
-                        if (sqLiteDataReader.HasRows)
-                        {
-                            while (sqLiteDataReader.Read())
+                            else
                             {
-                                string str = (sqLiteDataReader.GetString(1));
-                                long num = 0;
-                                try
+                                string[] date_split = acc_read.GetString(1).Split('-');
+                                string date_modified = new DateTime(Int32.Parse(date_split[2]), Int32.Parse(date_split[1]), Int32.Parse(date_split[0])).Ticks.ToString();
+                                string last_date_modified = "";
+                                
+                                if(acc_read.GetString(2) != "")
                                 {
-                                    num = long.Parse(sqLiteDataReader.GetString(1));
-                                    continue;
+                                    date_split = acc_read.GetString(2).Split('-');
+                                    last_date_modified = new DateTime(Int32.Parse(date_split[2]), Int32.Parse(date_split[1]), Int32.Parse(date_split[0])).Ticks.ToString();
                                 }
-                                catch (Exception)
-                                {
-                                    string[] strArray = str.Split('-');
-                                    DateTime dateTime = new DateTime(int.Parse(strArray[2]), int.Parse(strArray[1]), int.Parse(strArray[0]));
-                                    dictionary_rec.Add(sqLiteDataReader.GetString(0), dateTime.Ticks.ToString());
-                                }
+                                acc_table.Add(new account(acc_read.GetString(0), date_modified, last_date_modified));
                             }
-                        }
-                    }
-                }
-                using (SQLiteCommand sqLiteCommand = new SQLiteCommand("Update records set date=@Entry where posting_id=@Entry1", sqLiteConnection))
-                {
-                    foreach (string key in dictionary_rec.Keys)
-                    {
-                        sqLiteCommand.Parameters.AddWithValue("@Entry", (object)dictionary_rec[key]);
-                        sqLiteCommand.Parameters.AddWithValue("@Entry1", (object)key);
-                        try
-                        {
-                            sqLiteCommand.ExecuteNonQuery();
-                        }
-                        catch (Exception)
-                        {
-                            int num = (int)MessageBox.Show("Error");
-                            break;
                         }
                     }
                 }
 
+                List<records> rec_table = new List<records>();
+                using(SQLiteDataReader rec_read = new SQLiteCommand("Select posting_id, date from records", sqLiteConnection).ExecuteReader())
+                {
+                    if (rec_read.HasRows)
+                    {
+                        while (rec_read.Read())
+                        {
+                            long date_r;
+                            if(long.TryParse(rec_read.GetString(1), out date_r))
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                string[] date_split = rec_read.GetString(1).Split('-');
+                                string date_modified = new DateTime(Int32.Parse(date_split[2]), Int32.Parse(date_split[1]), Int32.Parse(date_split[0])).Ticks.ToString();
+
+                                rec_table.Add(new records(rec_read.GetString(0), date_modified));
+                            }
+                        }
+                    }
+                }
+
+                foreach(account acc in acc_table)
+                {
+                    using(SQLiteCommand updateAcc = new SQLiteCommand("Update accounts set date=@Entry, last_posting_date=@Entry1 where acc_id=@Entry2", sqLiteConnection))
+                    {
+                        updateAcc.Parameters.AddWithValue("@Entry", acc.date);
+                        updateAcc.Parameters.AddWithValue("@Entry1", acc.last_posting_date);
+                        updateAcc.Parameters.AddWithValue("@Entry2", acc.acc_id);
+
+                        try
+                        {
+                            updateAcc.ExecuteNonQuery();
+                        }
+                        catch(Exception e)
+                        {
+                            MessageBox.Show(e.ToString());
+                            sqLiteConnection.Close();
+                            return;
+                        }
+                    }
+                }
+
+                foreach(records rec in rec_table)
+                {
+                    using(SQLiteCommand updateRec = new SQLiteCommand("Update records set date=@Entry where posting_id=@Entry1", sqLiteConnection))
+                    {
+                        updateRec.Parameters.AddWithValue("@Entry", rec.date);
+                        updateRec.Parameters.AddWithValue("@Entry1", rec.posting_id);
+
+                        try
+                        {
+                            updateRec.ExecuteNonQuery();
+                        }
+                        catch(Exception e)
+                        {
+                            MessageBox.Show(e.ToString());
+                            sqLiteConnection.Close();
+                            return;
+                        }
+                    }
+                }
                 sqLiteConnection.Close();
             }
         }
@@ -183,7 +194,7 @@ namespace AccountFinance
             SQLiteConnection connection = new SQLiteConnection("Data source = " + old_dbpath + ";Version=3;");
             try
             {
-                string commandText1 = "CREATE TABLE IF NOT EXISTS accounts (acc_id NVARCHAR(2048) PRIMARY KEY NOT NULL ,date NVARCHAR(2048) NOT NULL,slno INTEGER NOT NULL UNIQUE,name varchar(255) NOT NULL,village NVARCHAR(2048),type NVARCHAR(2048) NOT NULL,interest_rate NUMERIC DEFAULT '0', reciept_amt NUMERIC DEFAULT 0, payment_amt NUMERIC DEFAULT 0,  share INTEGER NOT NULL DEFAULT 0)";
+                string commandText1 = "CREATE TABLE IF NOT EXISTS accounts (acc_id NVARCHAR(2048) NOT NULL ,date NVARCHAR(2048) NOT NULL,slno INTEGER NOT NULL,name varchar(255) NOT NULL,village NVARCHAR(2048),type NVARCHAR(2048) NOT NULL,interest_rate NUMERIC DEFAULT '0', reciept_amt NUMERIC DEFAULT 0, payment_amt NUMERIC DEFAULT 0, last_posting_date NVARCHAR(2048) NOT NULL DEFAULT '', share INTEGER NOT NULL DEFAULT 0, deleted_date NVARCHAR(2048) NOT NULL DEFAULT '')";
                 string commandText2 = "CREATE TABLE IF NOT EXISTS records (posting_id NVARCHAR(2048) NOT NULL PRIMARY KEY, date NVARCHAR(2048) NOT NULL,slno INTEGER NOT NULL,name varchar(255) NOT NULL, details varchar(255) NOT NULL DEFAULT '',reciept NUMERIC DEFAULT 0,payment NUMERIC DEFAULT 0,interest NUMERIC DEFAULT 0, acc_id NVARCHAR(2048) NOT NULL, FOREIGN KEY (acc_id) REFERENCES balances(acc_id))";
                 string commandText3 = "CREATE TABLE IF NOT EXISTS village(village NVARCHAR(2048) NOT NULL UNIQUE)";
                 string commandText4 = "CREATE TABLE IF NOT EXISTS lineTable(line_total_reciept NUMERIC Default 0,line_total_payment NUMERIC Default 0)";
@@ -234,7 +245,7 @@ namespace AccountFinance
 
         }
 
-        public void CreateAcc()
+        public bool CreateAcc()
         {
             var con = new SQLiteConnection("Data source = " + db_path);
             con.Open();
@@ -270,6 +281,10 @@ namespace AccountFinance
                                 {
                                     acc_list.Add(new account(x.GetString(0), x.GetString(1), x.GetInt32(2), x.GetString(3), x.GetString(4), x.GetString(5), x.GetDecimal(6), x.GetDecimal(7), x.GetDecimal(8), x.GetInt32(10)));
                                 }
+                                else
+                                {
+                                    acc_list.Add(new account(x.GetString(0), x.GetString(1), x.GetInt32(2), x.GetString(3), x.GetString(4), x.GetString(5), Decimal.Zero, Decimal.Zero, Decimal.Zero, x.GetInt32(10)));
+                                }
                             }
                             SQLiteCommand lineCmd = new SQLiteCommand("Select * from lineTable", con);
                             SQLiteDataReader read = lineCmd.ExecuteReader();
@@ -292,26 +307,67 @@ namespace AccountFinance
                                         r.Close();
                                         x.Close();
                                         con.Close();
-                                        return;
+                                        return false;
                                     }
                                 }
 
+                                Random rand = new Random();
+                                string[] date_split = DateTime.Now.ToString("dd-MM-yyyy").Split('-');
+                                string dateTicks = new DateTime(Int32.Parse(date_split[2]), Int32.Parse(date_split[1]), Int32.Parse(date_split[0])).Ticks.ToString();
                                 foreach (var acc in acc_list)
                                 {
-                                    SQLiteCommand insertCmd = new SQLiteCommand("INSERT INTO accounts(acc_id, date, slno, name, village, type, interest_rate, reciept_amt, payment_amt) VALUES(@Entry1,@Entry2,@Entry3,@Entry4,@Entry5,@Entry6,@Entry7,@Entry8, @Entry9)", con);
+                                    SQLiteCommand insertCmd = new SQLiteCommand("INSERT INTO accounts(acc_id, date, slno, name, village, type, interest_rate, reciept_amt, payment_amt, share) VALUES(@Entry1,@Entry2,@Entry3,@Entry4,@Entry5,@Entry6,@Entry7,@Entry8, @Entry9, @Entry10)", con);
                                     insertCmd.Parameters.AddWithValue("@Entry1", acc.acc_id);
-                                    insertCmd.Parameters.AddWithValue("@Entry2", DateTime.Now.ToString("dd-MM-yyyy"));
+                                    insertCmd.Parameters.AddWithValue("@Entry2", dateTicks);
                                     insertCmd.Parameters.AddWithValue("@Entry3", acc.slno);
                                     insertCmd.Parameters.AddWithValue("@Entry4", acc.name);
                                     insertCmd.Parameters.AddWithValue("@Entry5", acc.village);
                                     insertCmd.Parameters.AddWithValue("@Entry6", acc.type);
                                     insertCmd.Parameters.AddWithValue("@Entry7", acc.interest);
-                                    insertCmd.Parameters.AddWithValue("@Entry8", acc.reciept);
-                                    insertCmd.Parameters.AddWithValue("@Entry9", acc.payment);
+                                    insertCmd.Parameters.AddWithValue("@Entry8", Decimal.Zero);
+                                    insertCmd.Parameters.AddWithValue("@Entry9", Decimal.Zero);
+                                    insertCmd.Parameters.AddWithValue("@Entry10", acc.share);
 
                                     try
                                     {
                                         insertCmd.ExecuteNonQuery();
+
+                                        if(acc.type != "Profit" && acc.type != "Sadhar")
+                                        {
+                                            string posting_id = acc.name.Substring(0, acc.name.Length / 3) + "-" + acc.slno.ToString() + "-" + rand.Next().ToString();
+                                            decimal bal = acc.reciept - acc.payment;
+                                            decimal reciept = decimal.Zero, payment = decimal.Zero;
+                                            if(bal > 0)
+                                            {
+                                                reciept = bal;
+                                            }
+                                            else
+                                            {
+                                                payment = Math.Abs(bal);
+                                            }
+
+                                            List<string> inpdata = new List<string>();
+                                            inpdata.Add(posting_id);
+                                            inpdata.Add(dateTicks);
+                                            inpdata.Add(acc.slno.ToString());
+                                            inpdata.Add(acc.name);
+                                            inpdata.Add("New Account Posting");
+                                            inpdata.Add(reciept.ToString());
+                                            inpdata.Add(payment.ToString());
+                                            inpdata.Add(acc.interest.ToString());
+                                            inpdata.Add(acc.acc_id);
+
+                                            if (!Post_ac_data(inpdata))
+                                            {
+                                                read.Close();
+                                                r.Close();
+                                                x.Close();
+                                                con.Close();
+                                                MessageBox.Show("Error Posting New Account");
+                                                return false;
+                                            }
+                                        }
+
                                     }
                                     catch (Exception e)
                                     {
@@ -320,7 +376,7 @@ namespace AccountFinance
                                         x.Close();
                                         con.Close();
                                         MessageBox.Show(e.ToString());
-                                        return;
+                                        return false;
                                     }
                                 }
 
@@ -339,7 +395,7 @@ namespace AccountFinance
                                     x.Close();
                                     con.Close();
                                     MessageBox.Show(e.ToString());
-                                    return;
+                                    return false;
                                 }
                             }
                             else
@@ -349,7 +405,7 @@ namespace AccountFinance
                                 x.Close();
                                 con.Close();
                                 MessageBox.Show("Incorrect Data or Data is Empty");
-                                return;
+                                return false;
                             }
                             read.Close();
                         }
@@ -359,7 +415,7 @@ namespace AccountFinance
                             r.Close();
                             x.Close();
                             con.Close();
-                            return;
+                            return false;
                         }
                         x.Close();
                     }
@@ -368,7 +424,7 @@ namespace AccountFinance
                         r.Close();
                         con.Close();
                         MessageBox.Show(e.ToString());
-                        return;
+                        return false;
                     }
                 }
                 else
@@ -376,7 +432,7 @@ namespace AccountFinance
                     MessageBox.Show("Profit Not Equal to 0");
                     r.Close();
                     con.Close();
-                    return;
+                    return false;
                 }
             }
             else
@@ -384,11 +440,148 @@ namespace AccountFinance
                 MessageBox.Show("Profit Data Not Found");
                 r.Close();
                 con.Close();
-                return;
+                return false;
             }
 
             r.Close();
             con.Close();
+            return true;
+        }
+
+        //Error Handling to be Updated
+        public bool LoadFinalAcc(List<account> acc_int_share)
+        {
+            using(SQLiteConnection conn = new SQLiteConnection("Data Source=" + db_path))
+            {
+                conn.Open();
+                Dictionary<int, string> slno_acc = new Dictionary<int, string>();
+                using (SQLiteDataReader cmd = new SQLiteCommand("Select acc_id, slno from accounts where type IN ('Capital', 'Profit')", conn).ExecuteReader())
+                {
+                    if (cmd.HasRows)
+                    {
+                        while (cmd.Read())
+                        {
+                            slno_acc.Add(cmd.GetInt32(1), cmd.GetString(0));
+                        }
+                    }
+                }
+
+                Random random = new Random();
+                string[] date_split = DateTime.Now.ToString("dd-MM-yyyy").Split('-');
+                string date_ = new DateTime(Int32.Parse(date_split[2]), Int32.Parse(date_split[1]), Int32.Parse(date_split[0])).Ticks.ToString();
+
+                foreach (account acc in acc_int_share)
+                {
+                    List<string> inpdata = new List<string>();
+                    inpdata.Add(acc.name.Substring(0, acc.name.Length / 3) + "-" + acc.slno + "-" + random.Next().ToString());
+                    inpdata.Add(date_);
+                    inpdata.Add(acc.slno.ToString());
+                    inpdata.Add(acc.name.Split('-')[0]);
+                    inpdata.Add(acc.name);
+                    inpdata.Add(acc.bal_pos.ToString());
+                    inpdata.Add(acc.bal_neg.ToString());
+                    inpdata.Add("0");
+                    inpdata.Add(slno_acc[acc.slno]);
+
+                    Post_ac_data(inpdata);
+                }
+
+                int Profit_rec = 0;
+                int Profit_pay = 0;
+                using (SQLiteDataReader cmd = new SQLiteCommand("Select sum(r.reciept), sum(r.payment) from records r, accounts a where a.type='Profit' and r.slno == a.slno", conn).ExecuteReader())
+                {
+                    if (cmd.HasRows)
+                    {
+                        while (cmd.Read())
+                        {
+                            Profit_rec += cmd.GetInt32(0);
+                            Profit_pay += cmd.GetInt32(1);
+                        }
+                    }
+                }
+
+                account profit_acc = Get_ProfitAcc();
+                List<string> inppro = new List<string>();
+                inppro.Add("Profit-5" + random.Next().ToString());
+                inppro.Add(date_);
+                inppro.Add("5");
+                inppro.Add(profit_acc.name);
+                inppro.Add("Final Profit");
+                inppro.Add(Profit_pay.ToString());
+                inppro.Add(Profit_rec.ToString());
+                inppro.Add("0");
+                inppro.Add(slno_acc[5]);
+
+                Post_ac_data(inppro);
+
+                List<List<string>> inpSadhar = new List<List<string>>();
+
+                using (SQLiteDataReader cmd = new SQLiteCommand("Select sum(r.reciept), sum(r.payment), a.name, a.slno, a.acc_id from records r, accounts a where a.type='Sadhar' and r.slno == a.slno group by a.slno", conn).ExecuteReader())
+                {
+                    if (cmd.HasRows)
+                    {
+                        while (cmd.Read())
+                        {
+                            List<string> inpSadhr = new List<string>();
+                            inpSadhr.Add(cmd.GetString(2).Substring(0, cmd.GetString(2).Length/3) + "-" + cmd.GetInt32(3).ToString() + "-" +random.Next().ToString());
+                            inpSadhr.Add(date_);
+                            inpSadhr.Add(cmd.GetInt32(3).ToString());
+                            inpSadhr.Add(cmd.GetString(2));
+                            inpSadhr.Add("Final Sadhar");
+                            inpSadhr.Add(cmd.GetDecimal(1).ToString());
+                            inpSadhr.Add(cmd.GetDecimal(0).ToString());
+                            inpSadhr.Add("0");
+                            inpSadhr.Add(cmd.GetString(4));
+
+                            inpSadhar.Add(inpSadhr);
+                        }
+                    }
+                }
+
+                foreach(List<string> x in inpSadhar)
+                {
+                    Post_ac_data(x);
+                }
+
+                conn.Close();
+                /*
+                    Dictionary<int, List<decimal>> acc_r_p = new Dictionary<int, List<decimal>>();
+                using(SQLiteDataReader cmd = new SQLiteCommand("Select slno, name, reciept_amt, payment_amt, share from accounts where share>0 and type='Capital'", conn).ExecuteReader())
+                {
+                    if (cmd.HasRows)
+                    {
+                        while (cmd.Read())
+                        {
+                            acc_r_p.Add(cmd.GetInt32(0), new List<decimal>() { cmd.GetDecimal(2), cmd.GetDecimal(3) });
+                        }
+                    }
+                }
+
+                foreach(account acc in acc_int_share)
+                {
+                    int reciept_amt = (int)(acc_r_p[acc.slno][0] + acc.bal_pos);
+                    int payment_amt = (int)(acc_r_p[acc.slno][1] + acc.bal_neg);
+
+                    using(SQLiteCommand updateCmd = new SQLiteCommand("Update accounts set reciept_amt=@Entry, payment_amt=@Entry1 where slno=@Entry2", conn))
+                    {
+                        updateCmd.Parameters.AddWithValue("@Entry", reciept_amt);
+                        updateCmd.Parameters.AddWithValue("@Entry1", payment_amt);
+                        updateCmd.Parameters.AddWithValue("@Entry2", acc.slno);
+                        try
+                        {
+                            updateCmd.ExecuteNonQuery();
+                        }
+                        catch(Exception e)
+                        {
+                            MessageBox.Show(e.ToString());
+                            return false;
+                        }
+                    }
+                }            
+                 */
+            }
+
+            return true;
         }
 
         public void CreateDb()
@@ -428,7 +621,7 @@ namespace AccountFinance
             SQLiteConnection conn = new SQLiteConnection("Data source = " + old_dbpath + ";Version=3;");
             try
             {
-                string commandText1 = "CREATE TABLE IF NOT EXISTS accounts (acc_id NVARCHAR(2048) NOT NULL ,date NVARCHAR(2048) NOT NULL,slno INTEGER NOT NULL,name varchar(255) NOT NULL,village NVARCHAR(2048),type NVARCHAR(2048) NOT NULL,interest_rate NUMERIC DEFAULT '0', reciept_amt NUMERIC DEFAULT 0, payment_amt NUMERIC DEFAULT 0, last_posting_date NVARCHAR(2048) NOT NULL DEFAULT '', deleted_date NVARCHAR(2048) NOT NULL DEFAULT '', share INTEGER NOT NULL DEFAULT 0)";
+                string commandText1 = "CREATE TABLE IF NOT EXISTS accounts (acc_id NVARCHAR(2048) NOT NULL ,date NVARCHAR(2048) NOT NULL,slno INTEGER NOT NULL,name varchar(255) NOT NULL,village NVARCHAR(2048),type NVARCHAR(2048) NOT NULL,interest_rate NUMERIC DEFAULT '0', reciept_amt NUMERIC DEFAULT 0, payment_amt NUMERIC DEFAULT 0, last_posting_date NVARCHAR(2048) NOT NULL DEFAULT '', share INTEGER NOT NULL DEFAULT 0, deleted_date NVARCHAR(2048) NOT NULL DEFAULT '')";
                 string commandText2 = "CREATE TABLE IF NOT EXISTS records (posting_id NVARCHAR(2048) NOT NULL, date NVARCHAR(2048) NOT NULL,slno INTEGER NOT NULL,name varchar(255) NOT NULL, details varchar(255) NOT NULL DEFAULT '',reciept NUMERIC DEFAULT 0,payment NUMERIC DEFAULT 0,interest NUMERIC DEFAULT 0, acc_id NVARCHAR(2048) NOT NULL, FOREIGN KEY (acc_id) REFERENCES accounts(acc_id))";
                 string commandText3 = "CREATE TABLE IF NOT EXISTS village(village NVARCHAR(2048) NOT NULL UNIQUE)";
                 string commandText4 = "CREATE TABLE IF NOT EXISTS lineTable(line_total_reciept NUMERIC Default 0,line_total_payment NUMERIC Default 0)";
@@ -671,11 +864,20 @@ namespace AccountFinance
             
         }
 
-        public List<account> Load_acc_db(string inp = "", string type = "", int trail_b = 0, string date_t = "", bool p = false, string village_sch = "", bool monthly_int = false, string month="")
+        public List<account> Load_acc_db(string inp = "", string type = "", int trail_b = 0, string date_t = "", bool p = false, string village_sch = "", bool monthly_int = false, string month="", bool old= false)
         {
             List<account> accountList = new List<account>();
-          
-            using (SQLiteConnection connection = new SQLiteConnection("Data Source = " + db_path + ";Version=3;"))
+
+            string conn_url = "";
+            if (!old)
+            {
+                conn_url = "Data Source = " + db_path + ";Version=3;";
+            }
+            else
+            {
+                conn_url = "Data Source = " + old_dbpath + ";Version=3;";
+            }
+            using (SQLiteConnection connection = new SQLiteConnection(conn_url))
             {
                 connection.Open();
 
@@ -726,22 +928,40 @@ namespace AccountFinance
                             Decimal num1 = new Decimal();
                             Decimal num2 = new Decimal();
 
-                            using (SQLiteDataReader sqLiteDataReader2 = new SQLiteCommand("SELECT r.reciept, r.payment from accounts a, records r where r.slno == a.slno and a.type='Sadhar' and r.date<='" + date_t+ "'", connection).ExecuteReader())
+                            using (SQLiteDataReader sqLiteDataReader2 = new SQLiteCommand("SELECT sum(r.reciept), sum(r.payment) from accounts a, records r where r.slno == a.slno and a.type='Sadhar' and r.date<='" + date_t+ "'", connection).ExecuteReader())
                             {
                                 if (sqLiteDataReader2.HasRows)
                                 {
                                     while (sqLiteDataReader2.Read())
-                                        num1 += sqLiteDataReader2.GetDecimal(0) - sqLiteDataReader2.GetDecimal(1);
+                                    {
+                                        if(sqLiteDataReader2.GetValue(0).ToString() == "" && sqLiteDataReader2.GetValue(1).ToString() == "")
+                                        {
+                                            num1 += 0;
+                                        }
+                                        else
+                                        {
+                                            num1 += Math.Abs(sqLiteDataReader2.GetDecimal(0) - sqLiteDataReader2.GetDecimal(1));
+                                        }
+                                    }
                                 }
                                 sqLiteDataReader2.Close();
                             }
 
-                            using (SQLiteDataReader sqLiteDataReader3 = new SQLiteCommand("SELECT r.reciept, r.payment from accounts a, records r where r.slno == a.slno and a.type='Profit' and r.date<='" + date_t + "'", connection).ExecuteReader())
+                            using (SQLiteDataReader sqLiteDataReader3 = new SQLiteCommand("SELECT sum(r.reciept), sum(r.payment) from accounts a, records r where r.slno == a.slno and a.type='Profit' and r.date<='" + date_t + "'", connection).ExecuteReader())
                             {
                                 if (sqLiteDataReader3.HasRows)
                                 {
                                     while (sqLiteDataReader3.Read())
-                                        num2 += sqLiteDataReader3.GetDecimal(0) - sqLiteDataReader3.GetDecimal(1);
+                                    {
+                                        if(sqLiteDataReader3.GetValue(0).ToString() == "" && sqLiteDataReader3.GetValue(1).ToString() == "")
+                                        {
+                                            num2 += 0;
+                                        }
+                                        else
+                                        {
+                                            num2 += Math.Abs(sqLiteDataReader3.GetDecimal(0) - sqLiteDataReader3.GetDecimal(1));
+                                        }
+                                    }
                                 }
                                 sqLiteDataReader3.Close();
                             }
@@ -1131,11 +1351,16 @@ namespace AccountFinance
                     UpdCmd.Parameters.AddWithValue("@Entry", decimal.Parse(acc_update[1]));
                     UpdCmd.Parameters.AddWithValue("@Entry1", decimal.Parse(acc_update[2]));
                     UpdCmd.Parameters.AddWithValue("@Entry2", acc_update[0]);
-                    
+
+                    string[] date_split = null;
                     foreach(records reco in acc_rec_update)
                     {
-                        UpdCmd.Parameters.AddWithValue("@Entry3", reco.date);
+                        date_split = reco.date.Split('-');
+                        break;
                     }
+                    string dateTicks = new DateTime(Int32.Parse(date_split[2]), Int32.Parse(date_split[1]), Int32.Parse(date_split[0])).Ticks.ToString();
+
+                    UpdCmd.Parameters.AddWithValue("@Entry3", dateTicks);
 
                     try
                     {
@@ -1148,7 +1373,7 @@ namespace AccountFinance
                                 if (enumerator.MoveNext())
                                 {
                                     records current = enumerator.Current;
-                                    sqLiteCommand2.Parameters.AddWithValue("@Entry", (object)current.date);
+                                    sqLiteCommand2.Parameters.AddWithValue("@Entry", dateTicks);
                                     sqLiteCommand2.Parameters.AddWithValue("@Entry1", (object)current.details);
                                     sqLiteCommand2.Parameters.AddWithValue("@Entry2", (object)current.reciept);
                                     sqLiteCommand2.Parameters.AddWithValue("@Entry3", (object)current.payment);
@@ -1343,34 +1568,51 @@ namespace AccountFinance
             return numList;
         }
 
-        public List<records> Load_record(string sl_inp = "", string date = "", Decimal interest_rate =0, string name = "", bool p = false, bool partys = false, bool days_cal = false)
+        public List<records> Load_record(string sl_inp = "", string date = "", Decimal interest_rate =0, string name = "", bool p = false, bool partys = false, bool days_cal = false, bool old = false, string Monthbegin="", string Monthend="")
         {
+            string conn_url = "";
+            if (!old)
+            {
+                conn_url = "Data Source=" + db_path + ";Version=3;";
+            }
+            else
+            {
+                conn_url = "Data Source=" + old_dbpath + ";Version=3;";
+            }
+
             List<records> recordsList = new List<records>();
-            using(SQLiteConnection connection = new SQLiteConnection("Data Source=" + db_path + ";Version=3;"))
+            using(SQLiteConnection connection = new SQLiteConnection(conn_url))
             {
                 connection.Open();
                 SQLiteCommand sqLiteCommand = new SQLiteCommand();
 
-                if (!p)
+                if(Monthbegin == "" && Monthend == "")
                 {
-                    if (sl_inp == "" && date != "" && name == "")
-                        sqLiteCommand = new SQLiteCommand("Select * from records where date='" + date + "';", connection);
-                    else if (sl_inp != "" && date != "" && name == "")
-                        sqLiteCommand = new SQLiteCommand("Select * from records where slno=" + sl_inp + " and date<='" + date + "'", connection);
-                    else if (name != "" && date != "" && sl_inp == "")
-                        sqLiteCommand = new SQLiteCommand("Select * from records where name LIKE'%" + name + "%' and date<='" + date + "';", connection);
+                    if (!p)
+                    {
+                        if (sl_inp == "" && date != "" && name == "")
+                            sqLiteCommand = new SQLiteCommand("Select * from records where date='" + date + "';", connection);
+                        else if (sl_inp != "" && date != "" && name == "")
+                            sqLiteCommand = new SQLiteCommand("Select * from records where slno=" + sl_inp + " and date<='" + date + "'", connection);
+                        else if (name != "" && date != "" && sl_inp == "")
+                            sqLiteCommand = new SQLiteCommand("Select * from records where name LIKE'%" + name + "%' and date<='" + date + "';", connection);
 
+                    }
+                    else
+                    {
+                        if (sl_inp == "" && name == "")
+                            sqLiteCommand = new SQLiteCommand("Select * from records where date='" + date + "';", connection);
+                        else if (sl_inp != "" && date != "")
+                            sqLiteCommand = new SQLiteCommand("Select * from records where slno =" + sl_inp + " and date='" + date + "';", connection);
+                        else if (name != "" && date != "")
+                            sqLiteCommand = new SQLiteCommand("Select * from records where name =" + name + " and date='" + date + "';", connection);
+                        else if (sl_inp != "" && date != "" && name != "")
+                            sqLiteCommand = new SQLiteCommand("Select * from records where slno =" + sl_inp + " and date='" + date + "';", connection);
+                    }
                 }
                 else
                 {
-                    if (sl_inp == "" && name == "")
-                        sqLiteCommand = new SQLiteCommand("Select * from records where date='" + date + "';", connection);
-                    else if (sl_inp != "" && date != "")
-                        sqLiteCommand = new SQLiteCommand("Select * from records where slno =" + sl_inp + " and date='" + date + "';", connection);
-                    else if (name != "" && date != "")
-                        sqLiteCommand = new SQLiteCommand("Select * from records where name =" + name + " and date='" + date + "';", connection);
-                    else if (sl_inp != "" && date != "" && name != "")
-                        sqLiteCommand = new SQLiteCommand("Select * from records where slno =" + sl_inp + " and date='" + date + "';", connection);
+                    sqLiteCommand = new SQLiteCommand("Select * from records where slno=" + sl_inp + " and date>='" + Monthbegin + "' and date<='" + Monthend + "';",connection);
                 }
 
                 using (SQLiteDataReader sqLiteDataReader = sqLiteCommand.ExecuteReader())
@@ -1406,10 +1648,19 @@ namespace AccountFinance
             return recordsList;
         }
 
-        public List<int> Load_Partys()
+        public List<int> Load_Partys(bool old=false)
         {
+            string conn_url = "";
+            if (!old)
+            {
+                conn_url = "Data Source=" + db_path + ";Version=3;";
+            }
+            else
+            {
+                conn_url = "Data Source=" + old_dbpath + ";Version=3;";
+            }
             List<int> data = new List<int>();
-            using (SQLiteConnection con = new SQLiteConnection("Data Source=" + db_path + ";Version=3;"))
+            using (SQLiteConnection con = new SQLiteConnection(conn_url))
             {
                 con.Open();
 
@@ -1691,41 +1942,74 @@ namespace AccountFinance
             return last_date;
         }
 
-        public string Get_prev_postingDate(string slno, string date_="")
+        public string Get_prev_postingDate(string slno = "", string date_ = "", bool old = false)
         {
             string prev_post_date = "";
             List<DateTime> dt = new List<DateTime>();
+            string conn_url = "";
 
-            using(SQLiteConnection con = new SQLiteConnection("Data Source=" + db_path))
+            if (!old)
+            {
+                conn_url = "Data Source=" + db_path + ";Version=3;";
+            }
+            else
+            {
+                conn_url = "Data Source=" + old_dbpath + ";Version=3;";
+            }
+
+            using (SQLiteConnection con = new SQLiteConnection(conn_url))
             {
                 con.Open();
 
-                using(SQLiteCommand schCmd = new SQLiteCommand("Select date from records where slno='"+slno+"' order by date DESC Limit 2", con))
+                if(slno != "")
                 {
-                    using(SQLiteDataReader reader_ = schCmd.ExecuteReader())
+                    using (SQLiteCommand schCmd = new SQLiteCommand("Select date from records where slno='" + slno + "' order by date DESC Limit 2", con))
                     {
-                        if (reader_.HasRows)
+                        using (SQLiteDataReader reader_ = schCmd.ExecuteReader())
                         {
-                            while (reader_.Read())
+                            if (reader_.HasRows)
                             {
-                                prev_post_date = new DateTime(long.Parse(reader_.GetString(0))).ToString("dd-MM-yyyy");
-                            }
-                        }
-                        /*
-                        if (reader_.HasRows)
-                        {
-                            string[] date_split;
-                            while (reader_.Read())
-                            {
-                                if (reader_.GetString(0) != "" && reader_.GetString(0) != date_)
+                                while (reader_.Read())
                                 {
-                                    date_split = reader_.GetString(0).Split('-');
-                                    dt.Add(new DateTime(int.Parse(date_split[2]), int.Parse(date_split[1]), int.Parse(date_split[0])));
+                                    prev_post_date = new DateTime(long.Parse(reader_.GetString(0))).ToString("dd-MM-yyyy");
                                 }
                             }
-                        }*/
+                            /*
+                            if (reader_.HasRows)
+                            {
+                                string[] date_split;
+                                while (reader_.Read())
+                                {
+                                    if (reader_.GetString(0) != "" && reader_.GetString(0) != date_)
+                                    {
+                                        date_split = reader_.GetString(0).Split('-');
+                                        dt.Add(new DateTime(int.Parse(date_split[2]), int.Parse(date_split[1]), int.Parse(date_split[0])));
+                                    }
+                                }
+                            }*/
+                        }
                     }
                 }
+                else
+                {
+                    using (SQLiteCommand schCmd = new SQLiteCommand("Select date from accounts", con))
+                    {
+                        using (SQLiteDataReader reader_ = schCmd.ExecuteReader())
+                        {
+                            if (reader_.HasRows)
+                            {
+                                while (reader_.Read())
+                                {
+                                    if (reader_.GetString(0) != "" && reader_.GetString(0) != date_)
+                                    {
+                                        prev_post_date = new DateTime(long.Parse(reader_.GetString(0))).ToString("dd-MM-yyyy");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
                 con.Close();
             }
             /*
@@ -1750,7 +2034,7 @@ namespace AccountFinance
             using(SQLiteConnection con = new SQLiteConnection("DataSource = " + db_path))
             {
                 con.Open();
-                using(SQLiteCommand proCmd = new SQLiteCommand("Select * from accounts where slno='5'", con))
+                using(SQLiteCommand proCmd = new SQLiteCommand("Select * from accounts where type='Profit'", con))
                 {
                     using(SQLiteDataReader read = proCmd.ExecuteReader())
                     {

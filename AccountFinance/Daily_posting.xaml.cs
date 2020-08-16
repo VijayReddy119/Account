@@ -242,9 +242,11 @@ namespace AccountFinance
                         num6.ToString()
                     };
 
+                    string[] date_split = date_post.SelectedDate.Value.ToString("dd-MM-yyyy").Split('-');
+                    string dateTicks = new DateTime(Int32.Parse(date_split[2]), Int32.Parse(date_split[1]), Int32.Parse(date_split[0])).Ticks.ToString();
                     List<records> acc_rec_update = new List<records>()
                     {
-                        new records(pos_id, date_post.SelectedDate.Value.ToString("dd-MM-yyyy"), int.Parse(edit_slno), name_post_combo.Text, description_post.Text, reciept, payment, Decimal.Parse(interest_post.Text))
+                        new records(pos_id, dateTicks, int.Parse(edit_slno), name_post_combo.Text, description_post.Text, reciept, payment, Decimal.Parse(interest_post.Text))
                     };
 
                     List<Decimal> numList = dataAccess.Load_lineTotal();
@@ -264,10 +266,13 @@ namespace AccountFinance
                     if (dataAccess.Delete_rec(edit_slno, pos_id, reciept_b, payment_b))
                     {
                         Random rand = new Random();
+                        string[] date_split = date_post.SelectedDate.Value.ToString("dd-MM-yyyy").Split('-');
+                        string dateTicks = new DateTime(Int32.Parse(date_split[2]), Int32.Parse(date_split[1]), Int32.Parse(date_split[0])).Ticks.ToString();
+
                         List<string> inpdata = new List<string>()
                         {
                             slno_post_combo.Text+"-"+name_post_combo.Text.Substring(0,name_post_combo.Text.Length/3)+"-"+rand.Next(),
-                            date_post.SelectedDate.Value.ToString("dd-MM-yyyy"),
+                            dateTicks,
                             slno_post_combo.Text,
                             name_post_combo.Text,
                             description_post.Text,

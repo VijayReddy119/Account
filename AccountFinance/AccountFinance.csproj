@@ -155,6 +155,9 @@
     <Compile Include="New_Customers.xaml.cs">
       <DependentUpon>New_Customers.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Old_accounts_display.xaml.cs">
+      <DependentUpon>Old_accounts_display.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PartysList.xaml.cs">
       <DependentUpon>PartysList.xaml</DependentUpon>
     </Compile>
@@ -210,6 +213,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="New_Customers.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Old_accounts_display.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -90,7 +90,7 @@
                     <DataGridTextColumn Header="Date" Width="100" Binding="{Binding date}"/>
                     <DataGridTextColumn Header="Slno." Width="50" Binding="{Binding slno}"/>
                     <DataGridTextColumn Header="Name" Width="330" Binding="{Binding name}"/>
-                    <DataGridTextColumn Header="Village" Width="120" Binding="{Binding village}" Visibility="Collapsed"/>
+                    <DataGridTextColumn Header="Village" Width="120" Binding="{Binding village}"/>
                     <DataGridTextColumn Header="Type" Width="90" Binding="{Binding type}"/>
                     <DataGridTextColumn Header="Int" Width="50" Binding="{Binding interest}"/>
                     <DataGridTextColumn Header="Reciept" Width="80" Binding="{Binding reciept}"/>

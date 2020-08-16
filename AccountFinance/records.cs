@@ -91,5 +91,11 @@ namespace AccountFinance
             this.payment = payment;
             this.interest = interest_rate;
         }
+
+        public records(string posting_id, string date)
+        {
+            this.posting_id = posting_id;
+            this.date = date;
+        }
     }
 }

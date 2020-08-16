@@ -18,11 +18,12 @@
         <TextBlock Grid.Row="0" x:Name="trail_bal_txt" HorizontalAlignment="Center" Text="Trail Balance - 1" TextWrapping="Wrap"
              VerticalAlignment="Top" Height="45" Width="242" Foreground="White"
              FontSize="30" FontWeight="Bold"/>
-        <StackPanel Grid.Row="1" HorizontalAlignment="Right"  Width="251" VerticalAlignment="Center" Orientation="Horizontal">
+        <StackPanel Grid.Row="1" HorizontalAlignment="Right"  Width="355" VerticalAlignment="Center" Orientation="Horizontal" Margin="0,10,36,10">
             <Button Click="create_acc_Click" Content="Create Account" x:Name="create_acc" Width="100" Height="40" Visibility="Hidden"/>
+            <Button Click="load_Acc_Final_Click" x:Name="load_Acc_Final" Content="Load Final"  Width="100" Height="40" Visibility="Hidden"/>
             <DatePicker SelectedDateChanged="date_trail_SelectedDateChanged" x:Name="date_trail" Width="150" FontSize="22" SelectedDate="{x:Static sys:DateTime.Now}"/>
         </StackPanel>
-        <DataGrid x:Name="Output" HorizontalAlignment="Center" Width="556" FontSize="18" FontWeight="DemiBold" AutoGenerateColumns="false" Grid.Row="2" HorizontalScrollBarVisibility="Disabled">
+        <DataGrid x:Name="Output" HorizontalAlignment="Center" Width="708" FontSize="18" FontWeight="DemiBold" AutoGenerateColumns="false" Grid.Row="2" HorizontalScrollBarVisibility="Disabled" Margin="32,0,10,0">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Reciept" Width="150" Binding="{Binding bal_pos}">
                     <DataGridColumn.HeaderStyle>
@@ -31,7 +32,7 @@
                         </Style>
                     </DataGridColumn.HeaderStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn Header="Name" Width="250" Binding="{Binding name}">
+                <DataGridTextColumn Header="Name" Width="400" Binding="{Binding name}">
                     <DataGridColumn.HeaderStyle>
                         <Style TargetType="{x:Type DataGridColumnHeader}">
                             <Setter Property="Control.HorizontalContentAlignment" Value="Center"/>
