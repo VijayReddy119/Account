@@ -1846,6 +1846,41 @@ namespace AccountFinance
             return acc;
         }
 
+        public string Get_firstPostingdate(string slno = "", bool old = true)
+        {
+            string conn_url = "";
+
+            if (!old)
+            {
+                conn_url = "Data Source=" + db_path + ";Version=3;";
+            }
+            else
+            {
+                conn_url = "Data Source=" + old_dbpath + ";Version=3;";
+            }
+            string last_date = "";
+            using (SQLiteConnection con = new SQLiteConnection(conn_url))
+            {
+                con.Open();
+                using (SQLiteCommand check_Cmd = new SQLiteCommand("Select date from records where slno='" + slno + "' order by date Limit 1", con))
+                {
+                    using (SQLiteDataReader reader_ = check_Cmd.ExecuteReader())
+                    {
+                        if (reader_.HasRows)
+                        {
+                            while (reader_.Read())
+                            {
+                                last_date = new DateTime(long.Parse(reader_.GetString(0))).ToString("dd-MM-yyyy");
+                            }
+                        }
+                    }
+                }
+                con.Close();
+            }
+
+            return last_date;
+        }
+
         public string Get_last_postingDate()
         {
             string last_date = "";

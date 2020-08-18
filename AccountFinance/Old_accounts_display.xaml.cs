@@ -55,29 +55,6 @@ namespace BHAGAVANDVSOFTWARE
                 name_combo.SelectedIndex = 0;
                 slno_to_use = slno_combo.Text;
 
-                string[] old_date = dataAccess.Get_prev_postingDate(old: true).Split('-');
-                if (old_date[2] == DateTime.Now.Year.ToString())
-                {
-                    year_inp.Items.Add(old_date[2]);
-                }
-                else
-                {
-                    try
-                    {
-                        int prev = Int32.Parse(old_date[2]);
-                        int cur = Int32.Parse(DateTime.Now.Year.ToString());
-                        for (int i = prev; i <= cur; i++)
-                        {
-                            year_inp.Items.Add(i.ToString());
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        MessageBox.Show(e.ToString());
-                    }
-                }
-
-
                 Acc_Disp_Load(slno_to_use);
             }
         }
@@ -86,6 +63,33 @@ namespace BHAGAVANDVSOFTWARE
         {
             if (acc_id_name.ContainsKey(slno_inp))
             {
+                string date_temp = dataAccess.Get_firstPostingdate(slno_inp, true);
+                if (date_temp != "")
+                {
+                    year_inp.Items.Clear();
+                    string[] old_date = date_temp.Split('-');
+                    if (old_date[2] == DateTime.Now.Year.ToString())
+                    {
+                        year_inp.Items.Add(old_date[2]);
+                    }
+                    else
+                    {
+                        try
+                        {
+                            int prev = Int32.Parse(old_date[2]);
+                            int cur = Int32.Parse(DateTime.Now.Year.ToString());
+                            for (int i = prev; i <= cur; i++)
+                            {
+                                year_inp.Items.Add(i.ToString());
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            MessageBox.Show(e.ToString());
+                        }
+                    }
+                }
+
                 string[] date_split = date_acc.SelectedDate.Value.ToString("dd-MM-yyyy").Split('-');
                 string date = new DateTime(Int32.Parse(date_split[2]), Int32.Parse(date_split[1]), Int32.Parse(date_split[0])).Ticks.ToString();
 
