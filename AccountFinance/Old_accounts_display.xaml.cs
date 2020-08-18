@@ -26,6 +26,7 @@ namespace BHAGAVANDVSOFTWARE
         private List<records> acc_rec_list = new List<records>();
         private Dictionary<string, string> acc_id_name = new Dictionary<string, string>();
         private Dictionary<string, string> acc_name_id = new Dictionary<string, string>();
+        private Dictionary<string, string> slno_accid = new Dictionary<string, string>();
         private string slno_to_use = "";
 
         public Old_accounts_display()
@@ -36,21 +37,34 @@ namespace BHAGAVANDVSOFTWARE
             acc_list = dataAccess.Load_acc_db(old: true);
             if (acc_list != null)
             {
+                int count = 0;
                 foreach (account acc in acc_list)
                 {
-                    slno_combo.Items.Add((object)acc.slno);
-                    name_combo.Items.Add((object)acc.name);
-                    int slno = acc.slno;
-                    string key = slno.ToString();
+                    string key = acc.slno.ToString();
                     string name1 = acc.name;
-                    acc_id_name.Add(key, name1);
-                    string name2 = acc.name;
-                    slno = acc.slno;
-                    string str = slno.ToString();
-                    acc_name_id.Add(name2, str);
 
+                    if (acc_id_name.ContainsKey(key) || acc_name_id.ContainsKey(name1) || slno_accid.ContainsKey(key))
+                    {
+                        count++;
+                        slno_combo.Items.Add(acc.slno + "-" + count.ToString());
+                        name_combo.Items.Add(acc.name + "-" + count.ToString());
+
+                        acc_id_name.Add(key + "-" + count.ToString(), name1 + "-" + count.ToString());
+                        acc_name_id.Add(name1 + "-" + count.ToString(), key + "-" + count.ToString());
+
+                        slno_accid.Add(key + "-" + count.ToString(), acc.acc_id);
+                    }
+                    else
+                    {
+                        slno_combo.Items.Add((object)acc.slno);
+                        name_combo.Items.Add((object)acc.name);
+
+                        acc_id_name.Add(key, name1);
+                        acc_name_id.Add(name1, key);
+
+                        slno_accid.Add(key, acc.acc_id);
+                    }
                 }
-
                 slno_combo.SelectedIndex = 0;
                 name_combo.SelectedIndex = 0;
                 slno_to_use = slno_combo.Text;
@@ -93,19 +107,19 @@ namespace BHAGAVANDVSOFTWARE
                 string[] date_split = date_acc.SelectedDate.Value.ToString("dd-MM-yyyy").Split('-');
                 string date = new DateTime(Int32.Parse(date_split[2]), Int32.Parse(date_split[1]), Int32.Parse(date_split[0])).Ticks.ToString();
 
-                List<int> slno_info = dataAccess.Load_Partys(old:true);
+                List<string> slno_info = dataAccess.Load_Partys(old: true);
 
                 if (!isSingle)
                 {
                     if (slno_info != null && slno_combo.SelectedValue != null)
                     {
-                        if (slno_info.Contains(Int32.Parse(slno_combo.SelectedValue.ToString())))
+                        if (slno_info.Contains(slno_accid[slno_combo.SelectedValue.ToString()]))
                         {
                             Output_data.Width = 560;
                             Output_data.Columns[4].Visibility = Visibility.Visible;
                             total_int.Visibility = Visibility.Visible;
 
-                            acc_rec_list = dataAccess.Load_record(sl_inp: slno_inp, date: date, interest_rate: 0, partys: true, old: true);
+                            acc_rec_list = dataAccess.Load_record(sl_inp: slno_inp, date: date, interest_rate: 0, partys: true, old: true, acc_id: slno_accid[slno_combo.SelectedValue.ToString()]);
                         }
                         else
                         {

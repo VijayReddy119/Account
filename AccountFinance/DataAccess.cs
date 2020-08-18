@@ -35,9 +35,18 @@ namespace AccountFinance
             */
         }
 
-        public void ModifyTableData()
+        public void ModifyTableData(bool old = false)
         {
-            using (SQLiteConnection sqLiteConnection = new SQLiteConnection("Data Source=" + DataAccess.db_path))
+            string conn_url = "";
+            if (!old)
+            {
+                conn_url = "Data Source=" + db_path + ";Version=3;";
+            }
+            else
+            {
+                conn_url = "Data Source=" + old_dbpath + ";Version=3;";
+            }
+            using (SQLiteConnection sqLiteConnection = new SQLiteConnection(conn_url))
             {
                 sqLiteConnection.Open();
 
@@ -142,9 +151,18 @@ namespace AccountFinance
             }
         }
 
-        public static void CheckDB()
+        public static void CheckDB(bool old = false)
         {
-            using (SQLiteConnection sqLiteConnection = new SQLiteConnection("Data Source=" + DataAccess.db_path))
+            string conn_url = "";
+            if (!old)
+            {
+                conn_url = "Data Source=" + db_path + ";Version=3;";
+            }
+            else
+            {
+                conn_url = "Data Source=" + old_dbpath + ";Version=3;";
+            }
+            using (SQLiteConnection sqLiteConnection = new SQLiteConnection(conn_url))
             {
                 (sqLiteConnection).Open();
                 bool flag = false;
@@ -1568,7 +1586,7 @@ namespace AccountFinance
             return numList;
         }
 
-        public List<records> Load_record(string sl_inp = "", string date = "", Decimal interest_rate =0, string name = "", bool p = false, bool partys = false, bool days_cal = false, bool old = false, string Monthbegin="", string Monthend="")
+        public List<records> Load_record(string sl_inp = "", string date = "", Decimal interest_rate = 0, string name = "", bool p = false, bool partys = false, bool days_cal = false, bool old = false, string Monthbegin = "", string Monthend = "", string acc_id = "")
         {
             string conn_url = "";
             if (!old)
@@ -1581,12 +1599,12 @@ namespace AccountFinance
             }
 
             List<records> recordsList = new List<records>();
-            using(SQLiteConnection connection = new SQLiteConnection(conn_url))
+            using (SQLiteConnection connection = new SQLiteConnection(conn_url))
             {
                 connection.Open();
                 SQLiteCommand sqLiteCommand = new SQLiteCommand();
 
-                if(Monthbegin == "" && Monthend == "")
+                if (Monthbegin == "" && Monthend == "")
                 {
                     if (!p)
                     {
@@ -1600,19 +1618,26 @@ namespace AccountFinance
                     }
                     else
                     {
-                        if (sl_inp == "" && name == "")
-                            sqLiteCommand = new SQLiteCommand("Select * from records where date='" + date + "';", connection);
-                        else if (sl_inp != "" && date != "")
-                            sqLiteCommand = new SQLiteCommand("Select * from records where slno =" + sl_inp + " and date='" + date + "';", connection);
-                        else if (name != "" && date != "")
-                            sqLiteCommand = new SQLiteCommand("Select * from records where name =" + name + " and date='" + date + "';", connection);
-                        else if (sl_inp != "" && date != "" && name != "")
-                            sqLiteCommand = new SQLiteCommand("Select * from records where slno =" + sl_inp + " and date='" + date + "';", connection);
+                        if (acc_id == "")
+                        {
+                            if (sl_inp == "" && name == "")
+                                sqLiteCommand = new SQLiteCommand("Select * from records where date='" + date + "';", connection);
+                            else if (sl_inp != "" && date != "")
+                                sqLiteCommand = new SQLiteCommand("Select * from records where slno =" + sl_inp + " and date='" + date + "';", connection);
+                            else if (name != "" && date != "")
+                                sqLiteCommand = new SQLiteCommand("Select * from records where name =" + name + " and date='" + date + "';", connection);
+                            else if (sl_inp != "" && date != "" && name != "")
+                                sqLiteCommand = new SQLiteCommand("Select * from records where slno =" + sl_inp + " and date='" + date + "';", connection);
+                        }
+                        else
+                        {
+                            sqLiteCommand = new SQLiteCommand("Select * from records where date='" + date + "' and acc_id='" + acc_id + "';", connection);
+                        }
                     }
                 }
                 else
                 {
-                    sqLiteCommand = new SQLiteCommand("Select * from records where slno=" + sl_inp + " and date>='" + Monthbegin + "' and date<='" + Monthend + "';",connection);
+                    sqLiteCommand = new SQLiteCommand("Select * from records where slno=" + sl_inp + " and date>='" + Monthbegin + "' and date<='" + Monthend + "';", connection);
                 }
 
                 using (SQLiteDataReader sqLiteDataReader = sqLiteCommand.ExecuteReader())
@@ -1648,7 +1673,7 @@ namespace AccountFinance
             return recordsList;
         }
 
-        public List<int> Load_Partys(bool old=false)
+        public List<string> Load_Partys(bool old = false, bool getacc_id = false)
         {
             string conn_url = "";
             if (!old)
@@ -1659,22 +1684,44 @@ namespace AccountFinance
             {
                 conn_url = "Data Source=" + old_dbpath + ";Version=3;";
             }
-            List<int> data = new List<int>();
+            List<string> data = new List<string>();
             using (SQLiteConnection con = new SQLiteConnection(conn_url))
             {
                 con.Open();
 
-                using (SQLiteDataReader reader = new SQLiteCommand("Select slno from accounts where type='Partys' order by slno", con).ExecuteReader())
-                {
-                    if (reader.HasRows)
-                    {
-                        while (reader.Read())
-                        {
-                            data.Add(reader.GetInt32(0));
-                        }
-                    }
+                SQLiteCommand cmd = new SQLiteCommand();
 
-                    reader.Close();
+                if (getacc_id)
+                {
+                    cmd = new SQLiteCommand("Select acc_id from accounts where type='Partys' order by slno", con);
+                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                data.Add(reader.GetString(0));
+                            }
+                        }
+
+                        reader.Close();
+                    }
+                }
+                else
+                {
+                    cmd = new SQLiteCommand("Select slno from accounts where type='Partys' order by slno", con);
+                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                data.Add(reader.GetInt32(0).ToString());
+                            }
+                        }
+
+                        reader.Close();
+                    }
                 }
                 con.Close();
             }

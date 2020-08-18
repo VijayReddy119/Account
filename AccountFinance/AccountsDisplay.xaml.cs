@@ -84,13 +84,13 @@ namespace AccountFinance
                 string[] date_split = date_acc.SelectedDate.Value.ToString("dd-MM-yyyy").Split('-');
                 string date = new DateTime(Int32.Parse(date_split[2]), Int32.Parse(date_split[1]), Int32.Parse(date_split[0])).Ticks.ToString();
 
-                List<int> slno_info = dataAccess.Load_Partys();
+                List<string> slno_info = dataAccess.Load_Partys();
 
                 if (!isSingle)
                 {
                     if (slno_info != null && slno_combo.SelectedValue != null)
                     {
-                        if (slno_info.Contains(Int32.Parse(slno_combo.SelectedValue.ToString())))
+                        if (slno_info.Contains(slno_combo.SelectedValue.ToString()))
                         {
                             Output_data.Width = 880;
                             Output_data.Columns[7].Visibility = Visibility.Visible;
