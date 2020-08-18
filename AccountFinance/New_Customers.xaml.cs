@@ -177,6 +177,7 @@ namespace AccountFinance
                 village.Focus();*/
                 Save_Data();
                 interest_rate.IsEnabled = false;
+                share.IsEnabled = false;
                 village.IsEnabled = false;
                 add_village.IsEnabled = false;
                 add_village_btn.IsEnabled = false;
@@ -335,10 +336,21 @@ namespace AccountFinance
                 num1 = 0;
             if (num1 != 0)
             {
-                if (!dataAccess.Del_fromDB(acc_id))
-                    return;
-                MessageBox.Show("Deleted");
-                Reset_details();
+                switch (MessageBox.Show("Do you want to delete: " + edit_slno, "Delete Record", MessageBoxButton.YesNo))
+                {
+                    case MessageBoxResult.Yes:
+                        if (!dataAccess.Del_fromDB(acc_id))
+                        {
+                            MessageBox.Show("Can't Delete");
+                            return;
+                        }
+                        Reset_details();
+                        slno.Focus();
+                        break;
+                    case MessageBoxResult.No:
+                        MessageBox.Show("Delete Cancelled");
+                        break;
+                }
             }
             else
             {

@@ -1801,39 +1801,6 @@ namespace AccountFinance
             return true;
         }
 
-        public List<int> Get_sum_db(string table_name = "records", string date = "")
-        {
-            List<int> intList = new List<int>();
-            SQLiteConnection connection = new SQLiteConnection("Data Source=" + db_path + ";Version=3;");
-            connection.Open();
-            SQLiteCommand sqLiteCommand = new SQLiteCommand();
-            if (table_name == "records")
-                sqLiteCommand = new SQLiteCommand("Select sum(reciept), sum(payment) from records where date='" + date + "'", connection);
-            
-            SQLiteDataReader sqLiteDataReader = sqLiteCommand.ExecuteReader();
-            if (sqLiteDataReader.HasRows)
-            {
-                while (sqLiteDataReader.Read())
-                {
-                    if (sqLiteDataReader.GetValue(0) == null || sqLiteDataReader.GetValue(0).ToString() == "")
-                        intList.Add(0);
-                    else
-                        intList.Add(sqLiteDataReader.GetInt32(0));
-                    if (sqLiteDataReader.GetValue(1) == null || sqLiteDataReader.GetValue(1).ToString() == "")
-                        intList.Add(0);
-                    else
-                        intList.Add(sqLiteDataReader.GetInt32(1));
-                }
-            }
-            else
-                intList = (List<int>)null;
-
-            sqLiteDataReader.Close();
-
-            connection.Close();
-            return intList;
-        }
-
         public bool isContain_slno(string slno)
         {
             using (SQLiteConnection con = new SQLiteConnection("Data source=" + db_path))

@@ -237,6 +237,7 @@ namespace AccountFinance
                 t_ = "1";
                 trail_bal_txt.Text = "Trail Balance - 1";
                 create_acc.Visibility = Visibility.Hidden;
+                load_Acc_Final.Visibility = Visibility.Hidden;
             }
         }
 
